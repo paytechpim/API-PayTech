@@ -1,0 +1,40 @@
+# Arquivos de compilação
+bin/
+obj/
+
+# Arquivos de configuração do Visual Studio
+.vscode/
+*.suo
+*.user
+*.userprefs
+*.sln.docstates
+
+# Arquivos de saída da compilação
+*.dll
+*.exe
+*.pdb
+*.ipch/
+*.opendb
+*.log
+
+# Arquivos temporários
+**/*.log
+**/*.txt
+**/*.sqlite
+**/*.sqlite3
+**/*.db
+**/*.sqlite-shm
+**/*.sqlite-wal
+
+# Dependências e pacotes NuGet
+packages/
+*.nupkg
+*.paket.restore.json
+paket-files/
+
+# Arquivos de projeto
+.vscode/
+*.csproj.user
+*.suo
+*.user
+*.userprefs
