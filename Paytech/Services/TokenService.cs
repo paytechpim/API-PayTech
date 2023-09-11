@@ -9,6 +9,8 @@ namespace Paytech.Services
 {
     public class TokenService
     {
+        const int expiredTokenTime = 1;
+
         public static string GenerateToken(Login user)
         {
             var handler = new JwtSecurityTokenHandler();
@@ -23,11 +25,32 @@ namespace Paytech.Services
                 Subject = new ClaimsIdentity(new Claim[]
                 {
                     new Claim("id_login", user.Id.ToString()),
-                    new Claim(ClaimTypes.Name, user.Username.ToString()),
+                    new Claim(ClaimTypes.Name, user.Nome_Usuario.ToString()),
                     new Claim(ClaimTypes.Role, user.Tipo.ToString())
                   }),
                 SigningCredentials = credentials,
-                Expires = DateTime.UtcNow.AddMinutes(5),
+                Expires = DateTime.UtcNow.AddMinutes(expiredTokenTime),
+            };
+
+            var token = handler.CreateToken(tokenDescriptor);
+
+            return handler.WriteToken(token);
+        }
+
+        public static string GenerateToken(IEnumerable<Claim> claims)
+        {
+            var handler = new JwtSecurityTokenHandler();
+
+            var key = Encoding.ASCII.GetBytes(Configuration.PrivateKet);
+            var credentials = new SigningCredentials(
+                new SymmetricSecurityKey(key),
+                SecurityAlgorithms.HmacSha256Signature);
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(claims),
+                SigningCredentials = credentials,
+                Expires = DateTime.UtcNow.AddMinutes(expiredTokenTime),
             };
 
             var token = handler.CreateToken(tokenDescriptor);
@@ -58,11 +81,28 @@ namespace Paytech.Services
             var tokenHandler = new JwtSecurityTokenHandler();
             var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out var securityToken);
             if (securityToken is not JwtSecurityToken jwtSecurityToken ||
-                jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256,
-                    StringComparison.InvariantCultureIgnoreCase))
+                jwtSecurityToken.Header.Alg != SecurityAlgorithms.HmacSha256)
                 throw new SecurityTokenException("Token inválido");
 
             return principal;
+        }
+
+        private static List<(string, string)> _refreshTokens = new();
+
+        public static void SaveRefreshToken(string username, string refreshToken)
+        {
+            _refreshTokens.Add((username, refreshToken));
+        }
+
+        public static string GetRefreshToken(string username)
+        {
+            return _refreshTokens.FirstOrDefault(x => x.Item1 == username).Item2;
+        }
+
+        public static void DeleteRefreshToken(string username, string refreshToken)
+        {
+            var item = _refreshTokens.FirstOrDefault(x => x.Item1 == username && x.Item2 == refreshToken);
+            _refreshTokens.Remove(item);
         }
     }
 }

@@ -20,7 +20,7 @@ namespace Paytech.Repositories
         public Login GetByUsername(string Username)
         {
             using var db = new SqlConnection(_conn);
-            var login = db.QuerySingleOrDefault<Login>(Login.SELECT_BY_USERNAME, new { Username = Username });
+            var login = db.QuerySingleOrDefault<Login>(Login.SELECT_BY_USERNAME, new { Nome_Usuario = Username });
             return login;
         }
 
