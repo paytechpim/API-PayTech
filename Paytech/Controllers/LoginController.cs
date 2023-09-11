@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using Paytech.Models;
 using Paytech.Services;
 using System;
+using System.Runtime.CompilerServices;
 
 namespace Paytech.Controllers
 {
@@ -13,9 +14,9 @@ namespace Paytech.Controllers
     public class LoginController : ControllerBase
     {
         [HttpPost]
-        [Route("login")]
+        [Route("autenticar")]
         [AllowAnonymous]
-        public async Task<ActionResult<dynamic>> Authenticate([FromBody] Login user)
+        public async Task<ActionResult<dynamic>> Authenticate([FromBody] LoginAuth user)
         {
             var login = new LoginService().AuthenticateReturnLogin(user.Nome_Usuario, user.Senha);
 
