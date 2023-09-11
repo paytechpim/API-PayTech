@@ -17,9 +17,9 @@ namespace Paytech.Services
             return _funcionarioRepository.Insert(funcionario);
         }
 
-        public void Delete(string username)
+        public void Delete(int id)
         {
-            _funcionarioRepository.Delete(username);
+            _funcionarioRepository.Delete(id);
         }
 
         public List<Funcionario> GetAll()
@@ -32,7 +32,7 @@ namespace Paytech.Services
             return _funcionarioRepository.GetByName(name);
         }
 
-        public Funcionario GetById(string id)
+        public Funcionario GetById(int id)
         {
             return _funcionarioRepository.GetById(id);
         }

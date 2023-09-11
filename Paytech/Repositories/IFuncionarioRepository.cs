@@ -2,16 +2,18 @@
 
 namespace Paytech.Repositories
 {
-    public class IFuncionarioRepository
+    public interface IFuncionarioRepository
     {
-        bool Insert(Funcionario funcionario);
+            bool Insert(Funcionario funcionario);
 
-        Login GetById(string username);
+            Funcionario GetById(int id);
 
-        List<Funcionario> GetByName();
+            List<Funcionario> GetByName(string name);
 
-        List<Funcionario> GetAll();
+            List<Funcionario> GetAll();
 
-        void Delete(string id);
+            void Delete(int id);
+        }
     }
-}
+
+
