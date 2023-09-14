@@ -11,7 +11,7 @@ namespace Paytech.Repositories
 
         List<TituloEleitor> GetAll();
 
-        void AlterarTitulo(string numeroTitulo);
+        void AlterarTitulo(string numeroTitulo, string secao, string zona);
 
         void Delete(string username);
 
