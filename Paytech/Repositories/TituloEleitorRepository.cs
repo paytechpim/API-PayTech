@@ -18,14 +18,14 @@ namespace Paytech.Repositories
         public List<TituloEleitor> GetAll()
         {
             using var db = new SqlConnection(_conn);
-            var titulosEleitor = db.Query<TituloEleitor>(TituloEleitor.SELECT_ALL);
-            return (List<TituloEleitor>)titulosEleitor;
+            var titulosEleitor = db.Query<TituloEleitor>(TituloEleitor.SELECT_ALL).ToList();
+            return titulosEleitor;
         }
 
         public TituloEleitor GetByTitulo(string numeroTitulo)
         {
             using var db = new SqlConnection(_conn);
-            var tituloEleitor = db.QuerySingleOrDefault<TituloEleitor>(TituloEleitor.SELECT_BY_ID, new { NumeroTitulo = numeroTitulo });
+            var tituloEleitor = db.QuerySingleOrDefault<TituloEleitor>(TituloEleitor.SELECT_BY_ID, new { Numero_Titulo = numeroTitulo });
             return tituloEleitor;
         }
 
@@ -46,20 +46,5 @@ namespace Paytech.Repositories
             db.Execute(TituloEleitor.DELETE, tituloEleitor);
         }
 
-        public bool ValidacaoTituloEleitor(string numeroTitulo)
-        {
-            if (numeroTitulo.Length != 12)
-            {
-                return false;
-            }
-            foreach (char c in numeroTitulo)
-            {
-                if (!char.IsDigit(c))
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
     }
 }

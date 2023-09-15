@@ -34,5 +34,6 @@ namespace Paytech.Services
         {
             _tituloEleitorRepository.Delete(username);
         }
+
     }
 }
