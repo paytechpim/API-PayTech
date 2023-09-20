@@ -11,6 +11,5 @@ namespace Paytech.Repositories
         List<Login> GetAll();
 
         void Delete(string username);
-
     }
 }

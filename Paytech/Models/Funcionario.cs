@@ -34,17 +34,13 @@
         public DateOnly DataAdmissao { get; set; }
         public DateOnly DataNasc { get; set; }
         public DateOnly DataFgts { get; set;}
-        //public TituloEleitor TituloEleitor { get; set; }
+        public TituloEleitor TituloEleitor { get; set; }
         //public CarteiraTrabalho CarteiraTrabalho { get; set; }
-        //public Cnh Cnh { get; set; }
+        public Cnh Cnh { get; set; }
         public string Funcao { get; set; }
         public string EstadoCivil { get; set; }
-       // public Endereco Endereco { get; set; }
+        public Endereco Endereco { get; set; }
         public int HorasTrabalhadas { get; set; }
-
-
-
-
 
     }
 }
