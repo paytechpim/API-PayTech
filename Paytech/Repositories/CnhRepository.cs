@@ -11,6 +11,7 @@ namespace Paytech.Repositories
         {
             using var db = new SqlConnection(_conn);
             db.Execute(Cnh.INSERT, cnh);
+            //db.Close();
             return true;
         }
 
