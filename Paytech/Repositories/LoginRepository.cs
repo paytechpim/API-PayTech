@@ -10,15 +10,18 @@ namespace Paytech.Repositories
 
         public List<Login> GetAll()
         {
+            List<Login> list = new();
+
             using var db = new SqlConnection(_conn);
             var logins = db.Query<Login>(Login.SELECT_ALL);
             return (List<Login>)logins;
         }
 
-        public Login GetByUsername(string username)
+        public Login GetByUsername(string Username)
         {
             using var db = new SqlConnection(_conn);
-            return db.QuerySingleOrDefault<Login>(Login.SELECT_BY_USERNAME);
+            var login = db.QuerySingleOrDefault<Login>(Login.SELECT_BY_USERNAME, new { Nome_Usuario = Username });
+            return login;
         }
 
         public bool Insert(Login login)

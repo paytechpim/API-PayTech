@@ -43,6 +43,17 @@ namespace Paytech.Services
             return false;
         }
 
+        public Login? AuthenticateReturnLogin(string username, string senha)
+        {
+            Login login = _loginRepository.GetByUsername(username);
+
+            if (login != null && IsValidPassword(login, senha))
+            {
+                return login;
+            }
+            return null;
+        }
+
         private bool IsValidPassword(Login login, string password)
         {
             return login.Senha == password;
