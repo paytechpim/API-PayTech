@@ -6,7 +6,7 @@ namespace Paytech.Repositories
 {
     public class CnhRepository : ICnhRepository
     {
-        private string _conn = "Server=paytech.database.windows.net;Database=Paytech-DEV;User Id=diego;Password=Paytech2023;";
+        private string _conn = "Server=paytech.database.windows.net;Database=Paytech;User Id=diego;Password=Paytech2023;";
         public bool Insert(Cnh cnh)
         {
             using var db = new SqlConnection(_conn);

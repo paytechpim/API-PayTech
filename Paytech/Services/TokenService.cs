@@ -9,7 +9,7 @@ namespace Paytech.Services
 {
     public class TokenService
     {
-        const int expiredTokenTime = 1;
+        const int expiredTokenTime = 15;
 
         public static string GenerateToken(Login user)
         {
