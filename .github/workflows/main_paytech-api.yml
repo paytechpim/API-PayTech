@@ -53,5 +53,5 @@ jobs:
         with:
           app-name: 'paytech-api'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_9B29D32F4E4946D5B6C92C8D0FCCA10A }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_B1048C8B79324F3DA5AFC7007FF1647E }}
           package: .
