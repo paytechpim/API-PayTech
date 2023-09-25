@@ -32,7 +32,7 @@ namespace Paytech.Controllers
         }
 
         [HttpGet("GetById")]
-        public ActionResult<Beneficio> GetByTitulo(int id_beneficio)
+        public ActionResult<Beneficio> GetById(int id_beneficio)
         {
             var beneficio = new BeneficioService().GetById(id_beneficio);
             if (beneficio == null) return NotFound("Benefício informado não consta nos registros...");
