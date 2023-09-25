@@ -7,9 +7,9 @@ namespace Paytech.Services
     {
         private readonly IBeneficioRepository _beneficioRepository;
 
-        public BeneficioService(IBeneficioRepository beneficioRepository)
+        public BeneficioService()
         {
-            _beneficioRepository = beneficioRepository;
+            _beneficioRepository = new BeneficioRepository();
         }
 
         public bool Insert(Beneficio beneficio)

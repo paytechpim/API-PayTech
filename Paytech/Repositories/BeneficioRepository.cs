@@ -4,7 +4,7 @@ using Paytech.Models;
 
 namespace Paytech.Repositories
 {
-    public class BeneficioRepository
+    public class BeneficioRepository : IBeneficioRepository
     {
         private string _conn = "Server=paytech.database.windows.net;Database=Paytech;User Id=diego;Password=Paytech2023;";
         public bool Insert(Beneficio Beneficio)
