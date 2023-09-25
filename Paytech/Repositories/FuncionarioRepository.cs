@@ -19,10 +19,10 @@ namespace Paytech.Repositories
             using var db = new SqlConnection(_conn);
             return db.QueryFirstOrDefault<Funcionario>(Funcionario.SELECT_BY_ID);
         }
-        public Funcionario GetByName(string nome)
+        public List<Funcionario> GetByName(string nome)
         {
             using var db = new SqlConnection(_conn);
-            return db.QueryFirstOrDefault<Funcionario>(Funcionario.SELECT_BY_NAME);
+            return db.Query<Funcionario>(Funcionario.SELECT_BY_NAME).AsList();
         }
 
         public bool Insert(Funcionario funcionario)
@@ -39,14 +39,5 @@ namespace Paytech.Repositories
             db.Execute(Funcionario.DELETE, new { Id = id });
         }
 
-        List<Funcionario> IFuncionarioRepository.GetByName(string name)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Delete(string id)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

@@ -31,11 +31,11 @@
         public string NumReservista { get; set; }
         public string NomeMae { get; set; }
         public string NomePai { get; set; }
-        public DateOnly DataAdmissao { get; set; }
-        public DateOnly DataNasc { get; set; }
-        public DateOnly DataFgts { get; set;}
+        public DateTime? DataAdmissao { get; set; }
+        public DateTime? DataNasc { get; set; }
+        public DateTime? DataFgts { get; set;}
         public TituloEleitor TituloEleitor { get; set; }
-        //public CarteiraTrabalho CarteiraTrabalho { get; set; }
+        public CarteiraTrabalho CarteiraTrabalho { get; set; }
         public Cnh Cnh { get; set; }
         public string Funcao { get; set; }
         public string EstadoCivil { get; set; }

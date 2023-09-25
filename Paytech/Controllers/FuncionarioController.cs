@@ -9,29 +9,7 @@ namespace Paytech.Controllers
     [ApiController]
     public class FuncionarioController : ControllerBase
     {
-        [HttpGet(Name = "Get")]
-
-        public List<Funcionario> Get()
-        {
-            return new FuncionarioService().GetAll();
-        }
-
-        [HttpGet(Name = "GetByName")]
-
-        public List<Funcionario> GetByName(string nome)
-        {
-            return new FuncionarioService().GetByName(nome);
-        }
-
-        [HttpGet(Name = "GetById")]
-
-        public Funcionario GetById(int id)
-        {
-            return new FuncionarioService().GetById(id);
-        }
-
-
-        [HttpPost(Name = "Insert")]
+        [HttpPost("Insert")]
         public ActionResult Insert(Funcionario funcionario)
         {
             if (new FuncionarioService().Insert(funcionario))
@@ -40,7 +18,30 @@ namespace Paytech.Controllers
                 return BadRequest();
         }
 
-        [HttpDelete(Name = "Delete")]
+
+        [HttpGet("Get")]
+
+        public List<Funcionario> Get()
+        {
+            return new FuncionarioService().GetAll();
+        }
+
+        [HttpGet("GetByName")]
+
+        public List<Funcionario> GetByName(string nome)
+        {
+            return new FuncionarioService().GetByName(nome);
+        }
+
+        [HttpGet("GetById")]
+
+        public Funcionario GetById(int id)
+        {
+            return new FuncionarioService().GetById(id);
+        }
+
+
+        [HttpDelete("Delete")]
         public ActionResult Delete(int id)
         {
             new FuncionarioService().Delete(id);
