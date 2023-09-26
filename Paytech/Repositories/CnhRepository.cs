@@ -1,18 +1,18 @@
 ﻿using Dapper;
 using Microsoft.Data.SqlClient;
 using Paytech.Models;
+using System.Collections.Generic;
 
 namespace Paytech.Repositories
 {
     public class CnhRepository : ICnhRepository
     {
         private string _conn = "Server=paytech.database.windows.net;Database=Paytech;User Id=diego;Password=Paytech2023;";
-        public bool Insert(Cnh cnh)
+        public async Task<Cnh> Insert(Cnh cnh)
         {
             using var db = new SqlConnection(_conn);
             db.Execute(Cnh.INSERT, cnh);
-            //db.Close();
-            return true;
+            return cnh;
         }
 
         public List<Cnh> GetAll()

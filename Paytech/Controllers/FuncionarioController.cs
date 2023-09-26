@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Paytech.Models;
 using Paytech.Services;
+using System.Net;
 
 namespace Paytech.Controllers
 {
@@ -9,11 +10,12 @@ namespace Paytech.Controllers
     [ApiController]
     public class FuncionarioController : ControllerBase
     {
+
         [HttpPost("Insert")]
         public ActionResult Insert(Funcionario funcionario)
         {
-            if (new FuncionarioService().Insert(funcionario))
-                return StatusCode(200);
+            if (new FuncionarioService().Insert(funcionario) != null)
+                return StatusCode(200, funcionario);
             else
                 return BadRequest();
         }

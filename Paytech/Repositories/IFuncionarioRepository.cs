@@ -4,7 +4,7 @@ namespace Paytech.Repositories
 {
     public interface IFuncionarioRepository
     {
-            bool Insert(Funcionario funcionario);
+            Task<Funcionario> Insert(Funcionario funcionario);
 
             Funcionario GetById(int id);
 

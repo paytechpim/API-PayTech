@@ -16,7 +16,7 @@ namespace Paytech.Controllers
             if (UtilidadesCnh.ValidarCNH(cnh.Num_cnh) == false)
                 return StatusCode(413, "Número de cnh inválido, digite-o corretamente!");
 
-            if (new CnhService().Insert(cnh)) 
+            if (new CnhService().Insert(cnh) != null) 
                 return StatusCode(200, cnh);
             else
                 return BadRequest();

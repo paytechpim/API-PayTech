@@ -12,7 +12,7 @@ namespace Paytech.Services
             _funcionarioRepository = new FuncionarioRepository();
         }
 
-        public bool Insert(Funcionario funcionario)
+        public Task<Funcionario> Insert(Funcionario funcionario)
         {
             return _funcionarioRepository.Insert(funcionario);
         }

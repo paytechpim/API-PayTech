@@ -12,9 +12,9 @@ namespace Paytech.Services
             _cnhRepository = new CnhRepository();
         }
 
-        public bool Insert(Cnh cnh)
+        public async Task<Cnh> Insert(Cnh cnh)
         {
-            return _cnhRepository.Insert(cnh);
+            return await _cnhRepository.Insert(cnh);
         }
 
         public List<Cnh> GetAll()

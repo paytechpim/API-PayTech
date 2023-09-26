@@ -4,7 +4,7 @@ namespace Paytech.Repositories
 {
     public interface ICnhRepository
     {
-        bool Insert(Cnh cnh);
+        Task<Cnh> Insert(Cnh cnh);
 
         Cnh GetByNumCnh(string numeroTitulo);
 
