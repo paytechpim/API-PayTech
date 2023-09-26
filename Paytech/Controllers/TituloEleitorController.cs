@@ -13,10 +13,10 @@ namespace Paytech.Controllers
         [HttpPost("Insert")] 
         public ActionResult Insert([FromBody] TituloEleitor tituloEleitor)
         {
-            if (Utilidades.ValidacaoTituloEleitor(tituloEleitor.Numero_Titulo) == false)
+            if (UtilidadesTituloEleitor.ValidacaoTituloEleitor(tituloEleitor.Numero_Titulo) == false)
                 return StatusCode(413, "Título inválido, digite-o corretamente!");
 
-            if (Utilidades.ValidacaoSecaoEZona(tituloEleitor.Secao, tituloEleitor.Zona) == false)
+            if (UtilidadesTituloEleitor.ValidacaoSecaoEZona(tituloEleitor.Secao, tituloEleitor.Zona) == false)
                 return StatusCode(413, "Seção e/ou zona inválidas, digite corretamente!");
 
             if (new TituloEleitorService().Insert(tituloEleitor))
@@ -34,11 +34,11 @@ namespace Paytech.Controllers
         [HttpGet("GetByTitulo")] 
         public ActionResult<TituloEleitor>  GetByTitulo(string numeroTitulo)
         {
-            if (!Utilidades.ValidacaoTituloEleitor(numeroTitulo)) 
+            if (!UtilidadesTituloEleitor.ValidacaoTituloEleitor(numeroTitulo)) 
                 return StatusCode(413, "Este título não é válido, digite-o corretamente!");
 
             var titulo = new TituloEleitorService().GetByTitulo(numeroTitulo);
-            if (Utilidades.ValidacaoTituloEleitor(numeroTitulo) == false) return BadRequest("Este título não é válido, digite-o corretamente!");
+            if (UtilidadesTituloEleitor.ValidacaoTituloEleitor(numeroTitulo) == false) return BadRequest("Este título não é válido, digite-o corretamente!");
             if (titulo == null) return NotFound("Titulo informado não consta nos registros...");
             return StatusCode(200, titulo);
         }
@@ -47,10 +47,10 @@ namespace Paytech.Controllers
         [HttpPut("Update")]
         public ActionResult<TituloEleitor> AlterarDados(string numeroTitulo, string secao, string zona)
         {
-            if (!Utilidades.ValidacaoTituloEleitor(numeroTitulo)) 
+            if (!UtilidadesTituloEleitor.ValidacaoTituloEleitor(numeroTitulo)) 
                 return StatusCode(413, "Este título não é válido, digite-o corretamente!");
 
-            if (Utilidades.ValidacaoSecaoEZona(secao, zona) == false)
+            if (UtilidadesTituloEleitor.ValidacaoSecaoEZona(secao, zona) == false)
                 return StatusCode(413, "Seção e/ou zona inválidas, digite corretamente!");
 
             var titulo = new TituloEleitorService().GetByTitulo(numeroTitulo);
@@ -63,7 +63,7 @@ namespace Paytech.Controllers
         [HttpDelete("Delete")]
         public ActionResult Delete(string numeroTitulo)
         {
-            if (!Utilidades.ValidacaoTituloEleitor(numeroTitulo)) 
+            if (!UtilidadesTituloEleitor.ValidacaoTituloEleitor(numeroTitulo)) 
                 return StatusCode(413, "Este título não é válido, digite-o corretamente!");
 
             var titulo = new TituloEleitorService().GetByTitulo(numeroTitulo);
@@ -77,7 +77,7 @@ namespace Paytech.Controllers
 
 
     }
-    public static class Utilidades
+    public static class UtilidadesTituloEleitor
     {
         public static bool ValidacaoTituloEleitor(string numeroTitulo)
         {

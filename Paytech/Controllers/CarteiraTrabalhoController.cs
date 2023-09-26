@@ -12,13 +12,13 @@ namespace Paytech.Controllers
         [HttpPost("Insert")]
         public ActionResult Insert([FromBody] CarteiraTrabalho carteiraTrabalho)
         {
-            if (Utilidades.ValidarNumCTPS(carteiraTrabalho.NumCtps) == false)
+            if (UtilidadesCarteiraDeTrabalho.ValidarNumCTPS(carteiraTrabalho.NumCtps) == false)
                 return StatusCode(413, "Número CTPS inválido, digite-o corretamente!");
 
-            if (Utilidades.ValidarUf(carteiraTrabalho.UFCarteira) == false)
+            if (UtilidadesCarteiraDeTrabalho.ValidarUf(carteiraTrabalho.UFCarteira) == false)
                 return StatusCode(413, "UF inválido, digite corretamente!");
 
-            if (Utilidades.ValidarNumeroSerieCTPS(carteiraTrabalho.Serie) == false)
+            if (UtilidadesCarteiraDeTrabalho.ValidarNumeroSerieCTPS(carteiraTrabalho.Serie) == false)
                 return StatusCode(413, "Número de série inválido, digite corretamente!");
 
             if (new CarteiraTrabalhoService().Insert(carteiraTrabalho))
@@ -36,10 +36,10 @@ namespace Paytech.Controllers
         [HttpGet("GetById")]
         public ActionResult<CarteiraTrabalho> GetById(string numCtps, string uf)
         {
-            if (Utilidades.ValidarNumCTPS(numCtps) == false)
+            if (UtilidadesCarteiraDeTrabalho.ValidarNumCTPS(numCtps) == false)
                 return StatusCode(413, "Número CTPS inválido, digite-o corretamente!");
 
-            if (Utilidades.ValidarUf(uf) == false)
+            if (UtilidadesCarteiraDeTrabalho.ValidarUf(uf) == false)
                 return StatusCode(413, "UF inválido, digite corretamente!");
 
             var carteiraTrabalho = new CarteiraTrabalhoService().GetById(numCtps, uf);
@@ -51,13 +51,13 @@ namespace Paytech.Controllers
         [HttpPut("Update")]
         public ActionResult<CarteiraTrabalho> AlterarCarteira(string numCtps, string uf, string orgao, string serie, string cbo)
         {
-            if (Utilidades.ValidarNumCTPS(numCtps) == false)
+            if (UtilidadesCarteiraDeTrabalho.ValidarNumCTPS(numCtps) == false)
                 return StatusCode(413, "Número CTPS inválido, digite-o corretamente!");
 
-            if (Utilidades.ValidarUf(uf) == false)
+            if (UtilidadesCarteiraDeTrabalho.ValidarUf(uf) == false)
                 return StatusCode(413, "UF inválido, digite corretamente!");
 
-            if (Utilidades.ValidarNumeroSerieCTPS(serie) == false)
+            if (UtilidadesCarteiraDeTrabalho.ValidarNumeroSerieCTPS(serie) == false)
                 return StatusCode(413, "Número de série inválido, digite corretamente!");
 
             var carteiraTrabalho = new CarteiraTrabalhoService().GetById(numCtps, uf);
@@ -70,10 +70,10 @@ namespace Paytech.Controllers
         [HttpDelete("Delete")]
         public ActionResult Delete(string numCtps, string uf)
         {
-            if (Utilidades.ValidarNumCTPS(numCtps) == false)
+            if (UtilidadesCarteiraDeTrabalho.ValidarNumCTPS(numCtps) == false)
                 return StatusCode(413, "Número CTPS inválido, digite-o corretamente!");
 
-            if (Utilidades.ValidarUf(uf) == false)
+            if (UtilidadesCarteiraDeTrabalho.ValidarUf(uf) == false)
                 return StatusCode(413, "UF inválido, digite corretamente!");
 
             var carteiraTrabalho = new CarteiraTrabalhoService().GetById(numCtps, uf);
@@ -86,7 +86,7 @@ namespace Paytech.Controllers
         }
     }
 
-    public static class Utilidades
+    public static class UtilidadesCarteiraDeTrabalho
     {
         public static bool ValidarNumCTPS(string numCTPS)
         {
