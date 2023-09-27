@@ -21,7 +21,7 @@ namespace Paytech.Controllers
             if (UtilidadesCarteiraDeTrabalho.ValidarNumeroSerieCTPS(carteiraTrabalho.Serie) == false)
                 return StatusCode(413, "Número de série inválido, digite corretamente!");
 
-            if (new CarteiraTrabalhoService().Insert(carteiraTrabalho))
+            if (new CarteiraTrabalhoService().Insert(carteiraTrabalho) != null)
                 return StatusCode(200, carteiraTrabalho);
             else
                 return BadRequest();

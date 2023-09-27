@@ -19,7 +19,7 @@ namespace Paytech.Controllers
             if (UtilidadesTituloEleitor.ValidacaoSecaoEZona(tituloEleitor.Secao, tituloEleitor.Zona) == false)
                 return StatusCode(413, "Seção e/ou zona inválidas, digite corretamente!");
 
-            if (new TituloEleitorService().Insert(tituloEleitor))
+            if (new TituloEleitorService().Insert(tituloEleitor) != null)
                 return StatusCode(200, tituloEleitor);
             else
                 return BadRequest();

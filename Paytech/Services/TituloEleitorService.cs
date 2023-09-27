@@ -12,9 +12,9 @@ namespace Paytech.Services
             _tituloEleitorRepository = new TituloEleitorRepository();
         }
 
-        public bool Insert(TituloEleitor tituloEleitor)
+        public async Task<TituloEleitor> Insert(TituloEleitor tituloEleitor)
         {
-            return _tituloEleitorRepository.Insert(tituloEleitor);
+            return await _tituloEleitorRepository.Insert(tituloEleitor);
         }
 
         public List<TituloEleitor> GetAll()

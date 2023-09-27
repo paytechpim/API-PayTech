@@ -6,7 +6,7 @@ namespace Paytech.Services
     public class EnderecoService
     {
         static readonly HttpClient endereco = new HttpClient();
-        public async Task<EnderecoDTO> GetAddress(string cep)
+        public async Task<EnderecoDTO> BuscarEndereco(string cep)
         {
             try
             {

@@ -12,9 +12,9 @@ namespace Paytech.Services
             _carteiraTrabalhoRepository = new CarteiraTrabalhoRepository();
         }
 
-        public bool Insert(CarteiraTrabalho carteiraTrabalho)
+        public async Task<CarteiraTrabalho> Insert(CarteiraTrabalho carteiraTrabalho)
         {
-            return _carteiraTrabalhoRepository.Insert(carteiraTrabalho);
+            return await _carteiraTrabalhoRepository.Insert(carteiraTrabalho);
         }
 
         public List<CarteiraTrabalho> GetAll()

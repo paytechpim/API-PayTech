@@ -5,7 +5,7 @@ namespace Paytech.Repositories
 {
     public interface ITituloEleitorRepository
     {
-        bool Insert(TituloEleitor tituloEleitor);
+        Task<TituloEleitor> Insert(TituloEleitor tituloEleitor);
 
         TituloEleitor GetByTitulo(string numeroTitulo);
 

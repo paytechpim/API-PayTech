@@ -24,7 +24,7 @@ namespace Paytech.Models
 
 
         [JsonProperty("uf")]
-        public string Estado { get; set; }
+        public string Uf { get; set; }
 
 
         [JsonProperty("logradouro")]

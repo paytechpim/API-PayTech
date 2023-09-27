@@ -17,11 +17,13 @@
         public static readonly string INSERT = @"
         INSERT INTO Funcionario (
             ID, nome, CPF, RG, escolaridade, forma_pagamento, salario, telefone, genero, naturalidade, num_reservista, 
-            nome_mae, nome_pai, dt_admissao, dt_nascimento, dt_FGTS, num_CNH, funcao, estado_civil 
+            nome_mae, nome_pai, dt_admissao, dt_nascimento, dt_FGTS, numero_titulo, num_CNH, NumCtps, UFCarteira, funcao, estado_civil,
+            rua, numero, CEP, bairro, cidade, uf, complemento
         )
         VALUES (
             @Id, @Nome, @Cpf, @Rg, @Escolaridade, @Forma_pagamento, @Salario, @Telefone, @Genero, @Naturalidade, @Num_reservista,
-            @nome_mae, @nome_pai, @dt_admissao, @dt_nascimento, @dt_FGTS, @Num_cnh, @Funcao, @estado_civil
+            @nome_mae, @nome_pai, @dt_admissao, @dt_nascimento, @dt_FGTS, @Numero_Titulo, @Num_cnh, @NumCtps, @UFCarteira, @Funcao, @estado_civil,
+            @rua, @numero, @cep, @bairro, @cidade, @uf, @complemento
         )";
 
         public static readonly string DELETE = "DELETE FROM Funcionario WHERE ID = @Id";
@@ -44,13 +46,12 @@
         public DateTime? Dt_admissao { get; set; }
         public DateTime? Dt_nascimento { get; set; }
         public DateTime? Dt_FGTS { get; set;}
-        //public TituloEleitor TituloEleitor { get; set; }
-        //public CarteiraTrabalho? CarteiraTrabalho { get; set; }
+        public TituloEleitor TituloEleitor { get; set; }
+        public CarteiraTrabalho? CarteiraTrabalho { get; set; }
         public Cnh Cnh { get; set; }
         public string Funcao { get; set; }
         public string Estado_civil { get; set; }
-        //public Endereco Endereco { get; set; }
-        public int HorasTrabalhadas { get; set; }
+        public Endereco Endereco { get; set; }
 
     }
 }

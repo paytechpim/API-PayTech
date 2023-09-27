@@ -4,7 +4,7 @@ namespace Paytech.Repositories
 {
     public interface ICarteiraTrabalhoRepository
     {
-        bool Insert(CarteiraTrabalho carteiraTrabalho);
+        Task<CarteiraTrabalho> Insert(CarteiraTrabalho carteiraTrabalho);
 
         CarteiraTrabalho GetById(string numCtps, string UF);
 
