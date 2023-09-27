@@ -21,8 +21,8 @@
             funcao, estado_civil 
         )
         VALUES (
-            @Id, @Nome, @Cpf, @Rg, @Escolaridade, @FormaPagamento, @Salario, @Telefone, @Genero, @Naturalidade, @NumReservista,
-            @nome_mae, @nome_pai, @dt_admissao, @dt_nascimento, @dt_FGTS, @Cnh.num_CNH, 
+            @Id, @Nome, @Cpf, @Rg, @Escolaridade, @Forma_Pagamento, @Salario, @Telefone, @Genero, @Naturalidade, @NumReservista,
+            @nome_mae, @nome_pai, @dt_admissao, @dt_nascimento, @dt_FGTS, @Num_cnh, 
             @Funcao, @estado_civil
         )";
 
@@ -53,6 +53,7 @@
         public string Estado_civil { get; set; }
         //public Endereco Endereco { get; set; }
         public int HorasTrabalhadas { get; set; }
+        public string Num_cnh { get; set; }
 
     }
 }
