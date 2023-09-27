@@ -13,13 +13,32 @@ namespace Paytech.Repositories
         {
             var cnhService = new CnhService();
             var cnh = cnhService.GetByNumCnh(funcionario.Cnh.Num_cnh);
-            if(cnh == null)
-            {
-            cnh = await cnhService.Insert(funcionario.Cnh);
-            }
-            funcionario.Cnh = cnh;
+            cnh ??= await cnhService.Insert(funcionario.Cnh);
+            funcionario.Cnh.Num_cnh = cnh.Num_cnh;
             using var db = new SqlConnection(_conn);
-            db.Execute(Funcionario.INSERT, funcionario);
+            var param = new {
+                funcionario.Id,
+                funcionario.Nome,
+                funcionario.Cpf,
+                funcionario.Rg,
+                funcionario.Escolaridade,
+                funcionario.Forma_pagamento,
+                funcionario.Salario,
+                funcionario.Telefone,
+                funcionario.Genero,
+                funcionario.Naturalidade,
+                funcionario.Num_reservista,
+                funcionario.Nome_mae,
+                funcionario.Nome_pai,
+                funcionario.Dt_admissao,
+                funcionario.Dt_nascimento,
+                funcionario.Dt_FGTS,
+                funcionario.Cnh.Num_cnh,
+                funcionario.Funcao,
+                funcionario.Estado_civil,
+                funcionario.HorasTrabalhadas
+            };
+            db.Execute(Funcionario.INSERT, param);
             return funcionario;
         }
 

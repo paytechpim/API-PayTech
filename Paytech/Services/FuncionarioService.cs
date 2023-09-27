@@ -5,6 +5,13 @@ namespace Paytech.Services
 {
     public class FuncionarioService
     {
+        //private IFuncionarioRepository _funcionarioRepository;
+
+        //public FuncionarioService(IFuncionarioRepository funcionarioRepository)
+        //{
+        //    _funcionarioRepository = funcionarioRepository;
+        //}
+
         private IFuncionarioRepository _funcionarioRepository;
 
         public FuncionarioService()
