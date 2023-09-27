@@ -17,13 +17,17 @@
         public static readonly string INSERT = @"
         INSERT INTO Funcionario (
             ID, nome, CPF, RG, escolaridade, forma_pagamento, salario, telefone, genero, naturalidade, num_reservista, 
-            nome_mae, nome_pai, dt_admissao, dt_nascimento, dt_FGTS, num_CNH,
-            funcao, estado_civil 
+            nome_mae, nome_pai, dt_admissao, dt_nascimento, dt_FGTS, num_CNH, funcao, estado_civil 
         )
         VALUES (
+<<<<<<< HEAD
             @Id, @Nome, @Cpf, @Rg, @Escolaridade, @Forma_Pagamento, @Salario, @Telefone, @Genero, @Naturalidade, @NumReservista,
             @nome_mae, @nome_pai, @dt_admissao, @dt_nascimento, @dt_FGTS, @Num_cnh, 
             @Funcao, @estado_civil
+=======
+            @Id, @Nome, @Cpf, @Rg, @Escolaridade, @FormaPagamento, @Salario, @Telefone, @Genero, @Naturalidade, @Num_reservista,
+            @nome_mae, @nome_pai, @dt_admissao, @dt_nascimento, @dt_FGTS, @num_CNH, @Funcao, @estado_civil
+>>>>>>> 4dd43de607735bf6b0daf7d4643a17f76fc57108
         )";
 
         public static readonly string DELETE = "DELETE FROM Funcionario WHERE ID = @Id";
@@ -40,7 +44,7 @@
         public string Telefone { get; set; }
         public string Genero { get; set; }
         public string Naturalidade { get; set; }
-        public string NumReservista { get; set; }
+        public string Num_reservista { get; set; }
         public string? Nome_mae { get; set; }
         public string? Nome_pai { get; set; }
         public DateTime? Dt_admissao { get; set; }
