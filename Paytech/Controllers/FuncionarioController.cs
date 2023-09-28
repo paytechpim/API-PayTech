@@ -57,13 +57,17 @@ namespace Paytech.Controllers
         [HttpDelete("Delete")]
         public ActionResult Delete(int id)
         {
-            var funcionario = new FuncionarioService().GetById(id);
-            if (funcionario == null)
+            try
             {
-                return NotFound("Funcionário não encontrado!");
-            }
+            var funcionario = new FuncionarioService().GetById(id);
+            if (funcionario == null) return NotFound("Funcionário não encontrado!");
             new FuncionarioService().Delete(id);
             return StatusCode(200, funcionario);
+            }
+            catch (BadHttpRequestException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
     }

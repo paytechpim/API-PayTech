@@ -99,7 +99,7 @@ namespace Paytech.Repositories
             try
             {
                 using var db = new SqlConnection(configuration.GetConnectionString("sql"));
-                return db.Query<Funcionario>(Funcionario.SELECT_ALL).AsList();
+                return db.Query<Funcionario>(Funcionario.SELECT_ALL).ToList();
             }
             catch (SqlException ex)
             {
