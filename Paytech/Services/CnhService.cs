@@ -26,9 +26,9 @@ namespace Paytech.Services
             return _cnhRepository.GetByNumCnh(num_cnh);
         }
 
-        public void AlterarCnh(string num_cnh, string cateforia, DateTime? dt_emissao, DateTime? dt_vencimento)
+        public void AlterarCnh(Cnh cnh)
         {
-            _cnhRepository.AlterarCnh(num_cnh, cateforia, dt_emissao, dt_vencimento);
+            _cnhRepository.AlterarCnh(cnh);
         }
         public void Delete(string username)
         {

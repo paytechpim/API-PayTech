@@ -26,13 +26,13 @@ namespace Paytech.Services
             return _tituloEleitorRepository.GetByTitulo(numeroTitulo);
         }
 
-        public void AlterarDados(string numeroTitulo, string secao, string zona)
+        public void AlterarTitulo(TituloEleitor tituloEleitor)
         {
-            _tituloEleitorRepository.AlterarTitulo(numeroTitulo, secao, zona);
+            _tituloEleitorRepository.AlterarTitulo(tituloEleitor);
         }
-        public void Delete(string username)
+        public void Delete(string numeroTitulo)
         {
-            _tituloEleitorRepository.Delete(username);
+            _tituloEleitorRepository.Delete(numeroTitulo);
         }
 
     }

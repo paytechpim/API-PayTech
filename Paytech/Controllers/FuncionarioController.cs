@@ -21,7 +21,7 @@ namespace Paytech.Controllers
         }
 
 
-        [HttpGet("Get")]
+        [HttpGet("GetAll")]
 
         public List<Funcionario> Get()
         {
@@ -42,12 +42,28 @@ namespace Paytech.Controllers
             return new FuncionarioService().GetById(id);
         }
 
+        [HttpPut("Update")]
+        public ActionResult<Funcionario> AlterarFuncionario(Funcionario funcionario)
+        {
+
+            var funcionarioAdquirido = new FuncionarioService().GetById(funcionario.Id);
+            if (funcionarioAdquirido == null) return NotFound("Funcionário não encontrado");
+            new FuncionarioService().AlterarFuncionario(funcionario);
+            var tituloAtualizado = new FuncionarioService().GetById(funcionario.Id);
+            return StatusCode(201, tituloAtualizado);
+        }
+
 
         [HttpDelete("Delete")]
         public ActionResult Delete(int id)
         {
+            var funcionario = new FuncionarioService().GetById(id);
+            if (funcionario == null)
+            {
+                return NotFound("Funcionário não encontrado!");
+            }
             new FuncionarioService().Delete(id);
-            return NoContent();
+            return StatusCode(200, funcionario);
         }
 
     }

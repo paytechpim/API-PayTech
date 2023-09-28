@@ -15,11 +15,11 @@ namespace Paytech.Repositories
         {
             try
             {
-            using var db = new SqlConnection(configuration.GetConnectionString("sql"));
-            db.Execute(CarteiraTrabalho.INSERT, carteiraTrabalho);
-            return carteiraTrabalho;
+                using var db = new SqlConnection(configuration.GetConnectionString("sql"));
+                db.Execute(CarteiraTrabalho.INSERT, carteiraTrabalho);
+                return carteiraTrabalho;
             }
-            catch (Exception ex)
+            catch (SqlException ex)
             {
                 Console.WriteLine(ex.ToString());
                 throw ex;
@@ -30,11 +30,11 @@ namespace Paytech.Repositories
         {
             try
             {
-            using var db = new SqlConnection(configuration.GetConnectionString("sql"));
-            var carteirasTrabalho = db.Query<CarteiraTrabalho>(CarteiraTrabalho.SELECT_ALL).ToList();
-            return carteirasTrabalho;
+                using var db = new SqlConnection(configuration.GetConnectionString("sql"));
+                var carteirasTrabalho = db.Query<CarteiraTrabalho>(CarteiraTrabalho.SELECT_ALL).ToList();
+                return carteirasTrabalho;
             }
-            catch (Exception ex)
+            catch (SqlException ex)
             {
                 Console.WriteLine(ex.ToString());
                 throw ex;
@@ -45,11 +45,11 @@ namespace Paytech.Repositories
         {
             try
             {
-            using var db = new SqlConnection(configuration.GetConnectionString("sql"));
-            var carteiraTrabalho = db.QuerySingleOrDefault<CarteiraTrabalho>(CarteiraTrabalho.SELECT_BY_ID, new { NumCtps = numCtps, UFCarteira = UF });
-            return carteiraTrabalho;
+                using var db = new SqlConnection(configuration.GetConnectionString("sql"));
+                var carteiraTrabalho = db.QuerySingleOrDefault<CarteiraTrabalho>(CarteiraTrabalho.SELECT_BY_ID, new { NumCtps = numCtps, UFCarteira = UF });
+                return carteiraTrabalho;
             }
-            catch (Exception ex)
+            catch (SqlException ex)
             {
                 Console.WriteLine(ex.ToString());
                 throw ex;
@@ -57,18 +57,14 @@ namespace Paytech.Repositories
         }
 
 
-        public void AlterarCarteira(string numCtps, string UF, string orgao, string serie, string cbo)
+        public void AlterarCarteira(CarteiraTrabalho carteiraTrabalho)
         {
             try
             {
-            var carteiraTrabalho = GetById(numCtps, UF);
-            carteiraTrabalho.Orgao = orgao;
-            carteiraTrabalho.Serie = serie;
-            carteiraTrabalho.Cbo = cbo;
-            using var db = new SqlConnection(configuration.GetConnectionString("sql"));
-            db.Execute(CarteiraTrabalho.UPDATE, carteiraTrabalho);
+                    using var db = new SqlConnection(configuration.GetConnectionString("sql"));
+                    db.Execute(CarteiraTrabalho.UPDATE, carteiraTrabalho);
             }
-            catch (Exception ex)
+            catch (SqlException ex)
             {
                 Console.WriteLine(ex.ToString());
                 throw ex;
@@ -79,11 +75,11 @@ namespace Paytech.Repositories
         {
             try
             {
-            var carteiraTrabalho = GetById(numCtps, UF);
-            using var db = new SqlConnection(configuration.GetConnectionString("sql"));
-            db.Execute(CarteiraTrabalho.DELETE, carteiraTrabalho);
+                var carteiraTrabalho = GetById(numCtps, UF);
+                using var db = new SqlConnection(configuration.GetConnectionString("sql"));
+                db.Execute(CarteiraTrabalho.DELETE, carteiraTrabalho);
             }
-            catch (Exception ex)
+            catch (SqlException ex)
             {
                 Console.WriteLine(ex.ToString());
                 throw ex;

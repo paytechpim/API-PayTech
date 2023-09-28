@@ -20,7 +20,7 @@ namespace Paytech.Repositories
                 return tituloEleitor;
 
             }
-            catch (Exception ex)
+            catch (SqlException ex)
             {
                 Console.WriteLine(ex.ToString());
                 throw ex;
@@ -31,11 +31,10 @@ namespace Paytech.Repositories
         {
             try
             {
-            using var db = new SqlConnection(configuration.GetConnectionString("sql"));
-            var titulosEleitor = db.Query<TituloEleitor>(TituloEleitor.SELECT_ALL).ToList();
-            return titulosEleitor;
+                using var db = new SqlConnection(configuration.GetConnectionString("sql"));
+                return db.Query<TituloEleitor>(TituloEleitor.SELECT_ALL).ToList();
             }
-            catch (Exception ex)
+            catch (SqlException ex)
             {
                 Console.WriteLine(ex.ToString());
                 throw ex;
@@ -46,11 +45,11 @@ namespace Paytech.Repositories
         {
             try
             {
-            using var db = new SqlConnection(configuration.GetConnectionString("sql"));
-            var tituloEleitor = db.QuerySingleOrDefault<TituloEleitor>(TituloEleitor.SELECT_BY_ID, new { Numero_Titulo = numeroTitulo });
-            return tituloEleitor;
+                using var db = new SqlConnection(configuration.GetConnectionString("sql"));
+                var tituloEleitor = db.QuerySingleOrDefault<TituloEleitor>(TituloEleitor.SELECT_BY_ID, new { Numero_Titulo = numeroTitulo });
+                return tituloEleitor;
             }
-            catch (Exception ex)
+            catch (SqlException ex)
             {
                 Console.WriteLine(ex.ToString());
                 throw ex;
@@ -58,17 +57,14 @@ namespace Paytech.Repositories
         }
 
 
-        public void AlterarTitulo(string numeroTitulo, string secao, string zona)
+        public void AlterarTitulo(TituloEleitor tituloEleitor)
         {
             try
             {
-            var tituloEleitor = GetByTitulo(numeroTitulo);
-            tituloEleitor.Secao = secao;
-            tituloEleitor.Zona = zona;
-            using var db = new SqlConnection(configuration.GetConnectionString("sql"));
-            db.Execute(TituloEleitor.UPDATE, tituloEleitor);
+                using var db = new SqlConnection(configuration.GetConnectionString("sql"));
+                db.Execute(TituloEleitor.UPDATE, tituloEleitor);
             }
-            catch (Exception ex)
+            catch (SqlException ex)
             {
                 Console.WriteLine(ex.ToString());
                 throw ex;
@@ -79,11 +75,11 @@ namespace Paytech.Repositories
         {
             try
             {
-            var tituloEleitor = GetByTitulo(numeroTitulo);
-            using var db = new SqlConnection(configuration.GetConnectionString("sql"));
-            db.Execute(TituloEleitor.DELETE, tituloEleitor);
+                var tituloEleitor = GetByTitulo(numeroTitulo);
+                using var db = new SqlConnection(configuration.GetConnectionString("sql"));
+                db.Execute(TituloEleitor.DELETE, tituloEleitor);
             }
-            catch (Exception ex)
+            catch (SqlException ex)
             {
                 Console.WriteLine(ex.ToString());
                 throw ex;
@@ -92,3 +88,4 @@ namespace Paytech.Repositories
 
     }
 }
+

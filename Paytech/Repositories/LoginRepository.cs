@@ -13,8 +13,6 @@ namespace Paytech.Repositories
 
         public List<Login> GetAll()
         {
-            List<Login> list = new();
-
             using var db = new SqlConnection(configuration.GetConnectionString("sql"));
             var logins = db.Query<Login>(Login.SELECT_ALL);
             return (List<Login>)logins;
@@ -33,7 +31,6 @@ namespace Paytech.Repositories
             db.Execute(Login.INSERT, login);
             return true;
         }
-
 
         public void Delete(string username)
         {

@@ -26,9 +26,9 @@ namespace Paytech.Services
             return _carteiraTrabalhoRepository.GetById(numCtps, UF);
         }
 
-        public void AlterarCarteira(string numCtps, string UF, string orgao, string serie, string cbo)
+        public void AlterarCarteira(CarteiraTrabalho carteiraTrabalho)
         {
-            _carteiraTrabalhoRepository.AlterarCarteira(numCtps, UF, orgao, serie, cbo);
+            _carteiraTrabalhoRepository.AlterarCarteira(carteiraTrabalho);
         }
         public void Delete(string numCtps, string UF)
         {

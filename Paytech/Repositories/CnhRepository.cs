@@ -20,7 +20,7 @@ namespace Paytech.Repositories
                 db.Execute(Cnh.INSERT, cnh);
                 return cnh;
             }
-            catch (Exception ex)
+            catch (SqlException ex)
             {
                 Console.WriteLine(ex.ToString());
                 throw ex;
@@ -36,7 +36,7 @@ namespace Paytech.Repositories
                 return cnh_s;
             }
 
-            catch (Exception ex)
+            catch (SqlException ex)
             {
                 Console.WriteLine(ex.ToString());
                 throw ex;
@@ -48,10 +48,9 @@ namespace Paytech.Repositories
             try
             {
                 using var db = new SqlConnection(configuration.GetConnectionString("sql"));
-                var cnh = db.QuerySingleOrDefault<Cnh>(Cnh.SELECT_BY_ID, new { Num_cnh = num_cnh });
-                return cnh;
+                return db.QuerySingleOrDefault<Cnh>(Cnh.SELECT_BY_ID, new { Num_cnh = num_cnh });
             }
-            catch (Exception ex)
+            catch (SqlException ex)
             {
                 Console.WriteLine(ex.ToString());
                 throw ex;
@@ -59,18 +58,14 @@ namespace Paytech.Repositories
         }
 
 
-        public void AlterarCnh(string num_cnh, string categoria, DateTime? dt_emissao, DateTime? dt_vencimento)
+        public void AlterarCnh(Cnh cnh)
         {
             try
-            {
-            var cnh = GetByNumCnh(num_cnh);
-            cnh.Categoria = categoria;
-            cnh.Dt_emissao = dt_emissao;
-            cnh.Dt_vencimento = dt_vencimento;
+            {           
             using var db = new SqlConnection(configuration.GetConnectionString("sql"));
             db.Execute(Cnh.UPDATE, cnh);
             }
-            catch (Exception ex)
+            catch (SqlException ex)
             {
                 Console.WriteLine(ex.ToString());
                 throw ex;
@@ -85,7 +80,7 @@ namespace Paytech.Repositories
             using var db = new SqlConnection(configuration.GetConnectionString("sql"));
             db.Execute(Cnh.DELETE, cnh);
             }
-            catch (Exception ex)
+            catch (SqlException ex)
             {
                 Console.WriteLine(ex.ToString());
                 throw ex;

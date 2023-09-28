@@ -49,21 +49,21 @@ namespace Paytech.Controllers
 
 
         [HttpPut("Update")]
-        public ActionResult<CarteiraTrabalho> AlterarCarteira(string numCtps, string uf, string orgao, string serie, string cbo)
+        public ActionResult<CarteiraTrabalho> AlterarCarteira(CarteiraTrabalho carteiraTrabalho)
         {
-            if (UtilidadesCarteiraDeTrabalho.ValidarNumCTPS(numCtps) == false)
+            if (UtilidadesCarteiraDeTrabalho.ValidarNumCTPS(carteiraTrabalho.NumCtps) == false)
                 return StatusCode(413, "Número CTPS inválido, digite-o corretamente!");
 
-            if (UtilidadesCarteiraDeTrabalho.ValidarUf(uf) == false)
+            if (UtilidadesCarteiraDeTrabalho.ValidarUf(carteiraTrabalho.UFCarteira) == false)
                 return StatusCode(413, "UF inválido, digite corretamente!");
 
-            if (UtilidadesCarteiraDeTrabalho.ValidarNumeroSerieCTPS(serie) == false)
+            if (UtilidadesCarteiraDeTrabalho.ValidarNumeroSerieCTPS(carteiraTrabalho.Serie) == false)
                 return StatusCode(413, "Número de série inválido, digite corretamente!");
 
-            var carteiraTrabalho = new CarteiraTrabalhoService().GetById(numCtps, uf);
-            if (carteiraTrabalho == null) return NotFound("Título de eleitor não encontrado");
-            new CarteiraTrabalhoService().AlterarCarteira(numCtps, uf, orgao, serie, cbo);
-            var carteiraAtualizada = new CarteiraTrabalhoService().GetById(numCtps, uf);
+            var carteiraTrabalhoAdquirida = new CarteiraTrabalhoService().GetById(carteiraTrabalho.NumCtps, carteiraTrabalho.UFCarteira);
+            if (carteiraTrabalhoAdquirida == null) return NotFound("Carteira não encontrada");
+            new CarteiraTrabalhoService().AlterarCarteira(carteiraTrabalho);
+            var carteiraAtualizada = new CarteiraTrabalhoService().GetById(carteiraTrabalho.NumCtps, carteiraTrabalho.UFCarteira);
             return StatusCode(201, carteiraAtualizada);
         }
 

@@ -6,13 +6,13 @@ namespace Paytech.Repositories
     {
         Task<Cnh> Insert(Cnh cnh);
 
-        Cnh GetByNumCnh(string numeroTitulo);
+        Cnh GetByNumCnh(string num_cnh);
 
         List<Cnh> GetAll();
 
-        void AlterarCnh(string num_cnh, string categoria, DateTime? dt_emissao, DateTime? dt_vencimento);
+        void AlterarCnh(Cnh cnh);
 
-        void Delete(string username);
+        void Delete(string num_cnh);
 
     }
 }

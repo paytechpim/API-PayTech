@@ -45,18 +45,18 @@ namespace Paytech.Controllers
 
 
         [HttpPut("Update")]
-        public ActionResult<TituloEleitor> AlterarDados(string numeroTitulo, string secao, string zona)
+        public ActionResult<TituloEleitor> AlterarDados(TituloEleitor tituloEleitor)
         {
-            if (!UtilidadesTituloEleitor.ValidacaoTituloEleitor(numeroTitulo)) 
+            if (!UtilidadesTituloEleitor.ValidacaoTituloEleitor(tituloEleitor.Numero_Titulo)) 
                 return StatusCode(413, "Este título não é válido, digite-o corretamente!");
 
-            if (UtilidadesTituloEleitor.ValidacaoSecaoEZona(secao, zona) == false)
+            if (UtilidadesTituloEleitor.ValidacaoSecaoEZona(tituloEleitor.Secao, tituloEleitor.Zona) == false)
                 return StatusCode(413, "Seção e/ou zona inválidas, digite corretamente!");
 
-            var titulo = new TituloEleitorService().GetByTitulo(numeroTitulo);
-            if (titulo == null) return NotFound("Título de eleitor não encontrado");
-            new TituloEleitorService().AlterarDados(numeroTitulo, secao, zona);
-            var tituloAtualizado = new TituloEleitorService().GetByTitulo(numeroTitulo);
+            var tituloAdquirido = new TituloEleitorService().GetByTitulo(tituloEleitor.Numero_Titulo);
+            if (tituloAdquirido == null) return NotFound("Título de eleitor não encontrado");
+            new TituloEleitorService().AlterarTitulo(tituloEleitor);
+            var tituloAtualizado = new TituloEleitorService().GetByTitulo(tituloEleitor.Numero_Titulo);
             return StatusCode(201, tituloAtualizado);
         }
 

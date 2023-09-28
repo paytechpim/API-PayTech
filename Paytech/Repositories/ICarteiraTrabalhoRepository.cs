@@ -10,7 +10,7 @@ namespace Paytech.Repositories
 
         List<CarteiraTrabalho> GetAll();
 
-        void AlterarCarteira(string numCtps, string UF, string orgao, string serie, string cbo);
+        void AlterarCarteira(CarteiraTrabalho carteiraTrabalho);
 
         void Delete(string numCtps, string UF);
     }
