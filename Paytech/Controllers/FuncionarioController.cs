@@ -46,10 +46,10 @@ namespace Paytech.Controllers
         public ActionResult<Funcionario> AlterarFuncionario(Funcionario funcionario)
         {
 
-            var funcionarioAdquirido = new FuncionarioService().GetById(funcionario.Id);
+            var funcionarioAdquirido = new FuncionarioService().GetById((int)funcionario.Id);
             if (funcionarioAdquirido == null) return NotFound("Funcionário não encontrado");
             new FuncionarioService().AlterarFuncionario(funcionario);
-            var tituloAtualizado = new FuncionarioService().GetById(funcionario.Id);
+            var tituloAtualizado = new FuncionarioService().GetById((int)funcionario.Id);
             return StatusCode(201, tituloAtualizado);
         }
 

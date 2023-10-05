@@ -36,24 +36,26 @@ namespace Paytech.Repositories
                 carteira ??= await carteiraService.Insert(funcionario.CarteiraTrabalho);
                 funcionario.CarteiraTrabalho = carteira;
 
-                var enderecoService = new EnderecoService();
-                var dto = enderecoService.BuscarEndereco(funcionario.Endereco.Cep).Result;
-                Endereco endereco = new()
+                if(funcionario.Endereco.Cep != "")
                 {
-                    Rua = dto.Rua,
-                    Numero = funcionario.Endereco.Numero,
-                    Cep = dto.Cep,
-                    Bairro = dto.Bairro,
-                    Cidade = dto.Cidade,
-                    Uf = dto.Uf,
-                    Complemento = funcionario.Endereco.Complemento
-                };
-                funcionario.Endereco = endereco;
+                    var enderecoService = new EnderecoService();
+                    var dto = enderecoService.BuscarEndereco(funcionario.Endereco.Cep).Result;
+                    Endereco endereco = new()
+                    {
+                        Rua = dto.Rua,
+                        Numero = funcionario.Endereco.Numero,
+                        Cep = dto.Cep,
+                        Bairro = dto.Bairro,
+                        Cidade = dto.Cidade,
+                        Uf = dto.Uf,
+                        Complemento = funcionario.Endereco.Complemento
+                    };
+                    funcionario.Endereco = endereco;
+                }
 
                 using var db = new SqlConnection(configuration.GetConnectionString("sql"));
                 var param = new
                 {
-                    funcionario.Id,
                     funcionario.Nome,
                     funcionario.Cpf,
                     funcionario.Rg,
@@ -75,13 +77,13 @@ namespace Paytech.Repositories
                     funcionario.CarteiraTrabalho.UFCarteira,
                     funcionario.Funcao,
                     funcionario.Estado_civil,
-                    endereco.Rua,
-                    endereco.Numero,
-                    endereco.Cep,
-                    endereco.Bairro,
-                    endereco.Cidade,
-                    endereco.Uf,
-                    endereco.Complemento
+                    funcionario.Endereco.Rua,
+                    funcionario.Endereco.Numero,
+                    funcionario.Endereco.Cep,
+                    funcionario.Endereco.Bairro,
+                    funcionario.Endereco.Cidade,
+                    funcionario.Endereco.Uf,
+                    funcionario.Endereco.Complemento
                 };
                 db.Execute(Funcionario.INSERT, param);
                 return funcionario;
