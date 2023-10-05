@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using Newtonsoft.Json;
 using Paytech.Controllers;
 using Paytech.Models;
 using Paytech.Services;
@@ -114,8 +115,18 @@ namespace Paytech.Repositories
         {
             try
             {
+                Funcionario funcionario = new Funcionario();
+
                 using var db = new SqlConnection(configuration.GetConnectionString("sql"));
-                return db.QueryFirstOrDefault<Funcionario>(Funcionario.SELECT_BY_ID, new { Id = id });
+                var selectFunc = db.QueryFirstOrDefault(Funcionario.SELECT_BY_ID, new { Id = id });
+
+                funcionario = JsonConvert.DeserializeObject<Funcionario>(JsonConvert.SerializeObject(selectFunc));
+                funcionario.Cnh = new CnhService().GetByNumCnh(selectFunc.num_CNH);
+                funcionario.TituloEleitor = new TituloEleitorService().GetByTitulo(selectFunc.numero_titulo);
+                funcionario.CarteiraTrabalho = new CarteiraTrabalhoService().GetById(selectFunc.NumCtps, selectFunc.UFCarteira);
+                funcionario.Endereco = JsonConvert.DeserializeObject<Endereco>(JsonConvert.SerializeObject(selectFunc));
+
+                return funcionario;
             }
             catch (SqlException ex)
             {
