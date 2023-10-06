@@ -40,14 +40,9 @@ namespace Paytech.Controllers
         }
 
         [HttpPut("Update")]
-        public ActionResult<Funcionario> AlterarFuncionario(Funcionario funcionario)
+        public async Task<Retorno> AlterarFuncionario(Funcionario funcionario)
         {
-
-            var funcionarioAdquirido = new FuncionarioService().GetById((int)funcionario.Id);
-            if (funcionarioAdquirido == null) return NotFound("Funcionário não encontrado");
-            new FuncionarioService().AlterarFuncionario(funcionario);
-            var tituloAtualizado = new FuncionarioService().GetById((int)funcionario.Id);
-            return StatusCode(201, tituloAtualizado);
+            return await new FuncionarioService().AlterarFuncionario(funcionario);
         }
 
 

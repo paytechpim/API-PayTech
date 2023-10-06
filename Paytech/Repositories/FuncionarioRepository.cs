@@ -49,22 +49,22 @@ namespace Paytech.Repositories
                     funcionario.CarteiraTrabalho = carteira;
                 }
 
-                if(!string.IsNullOrEmpty(funcionario.Endereco.Cep))
-                {
-                    var enderecoService = new EnderecoService();
-                    var dto = enderecoService.BuscarEndereco(funcionario.Endereco.Cep).Result;
-                    Endereco endereco = new()
-                    {
-                        Rua = dto.Rua,
-                        Numero = funcionario.Endereco.Numero,
-                        Cep = dto.Cep,
-                        Bairro = dto.Bairro,
-                        Cidade = dto.Cidade,
-                        Uf = dto.Uf,
-                        Complemento = funcionario.Endereco.Complemento
-                    };
-                    funcionario.Endereco = endereco;
-                }
+                //if(!string.IsNullOrEmpty(funcionario.Endereco.Cep))
+                //{
+                //    var enderecoService = new EnderecoService();
+                //    var dto = enderecoService.BuscarEndereco(funcionario.Endereco.Cep).Result;
+                //    Endereco endereco = new()
+                //    {
+                //        Rua = dto.Rua,
+                //        Numero = funcionario.Endereco.Numero,
+                //        Cep = dto.Cep,
+                //        Bairro = dto.Bairro,
+                //        Cidade = dto.Cidade,
+                //        Uf = dto.Uf,
+                //        Complemento = funcionario.Endereco.Complemento
+                //    };
+                //    funcionario.Endereco = endereco;
+                //}
 
                 using var db = new SqlConnection(configuration.GetConnectionString("sql"));
                 var param = new
@@ -140,7 +140,7 @@ namespace Paytech.Repositories
         public Funcionario GetById(int id)
         {
             try
-            {
+                {
                 Funcionario funcionario = new Funcionario();
 
                 using var db = new SqlConnection(configuration.GetConnectionString("sql"));
@@ -149,9 +149,9 @@ namespace Paytech.Repositories
                 if(selectFunc?.ID > 0)
                 {
                     funcionario = JsonConvert.DeserializeObject<Funcionario>(JsonConvert.SerializeObject(selectFunc));
-                    funcionario.Cnh = !string.IsNullOrEmpty(funcionario?.Cnh?.Num_cnh) ? new CnhService().GetByNumCnh(selectFunc.num_CNH) : new Cnh();
-                    funcionario.TituloEleitor = !string.IsNullOrEmpty(funcionario?.TituloEleitor?.Numero_Titulo) ? new TituloEleitorService().GetByTitulo(selectFunc.numero_titulo) : new TituloEleitor();
-                    funcionario.CarteiraTrabalho = !string.IsNullOrEmpty(funcionario?.CarteiraTrabalho?.NumCtps) && !string.IsNullOrEmpty(funcionario?.CarteiraTrabalho?.UFCarteira) ? new CarteiraTrabalhoService().GetById(selectFunc.NumCtps, selectFunc.UFCarteira) : new CarteiraTrabalho();
+                    funcionario.Cnh = !string.IsNullOrEmpty(selectFunc.num_CNH) ? new CnhService().GetByNumCnh(selectFunc.num_CNH) : new Cnh();
+                    funcionario.TituloEleitor = !string.IsNullOrEmpty(selectFunc.numero_titulo) ? new TituloEleitorService().GetByTitulo(selectFunc.numero_titulo) : new TituloEleitor();
+                    funcionario.CarteiraTrabalho = !string.IsNullOrEmpty(selectFunc.NumCtps) && !string.IsNullOrEmpty(selectFunc.UFCarteira) ? new CarteiraTrabalhoService().GetById(selectFunc.NumCtps, selectFunc.UFCarteira) : new CarteiraTrabalho();
                     funcionario.Endereco = JsonConvert.DeserializeObject<Endereco>(JsonConvert.SerializeObject(selectFunc));
                 }
 
@@ -178,7 +178,7 @@ namespace Paytech.Repositories
                 throw ex;
             }
         }
-        public void AlterarFuncionario(Funcionario funcionario)
+        public async Task<Retorno> AlterarFuncionario(Funcionario funcionario)
         {
             try
             {
@@ -214,19 +214,6 @@ namespace Paytech.Repositories
                     tituloEleitorService.AlterarTitulo(funcionario.TituloEleitor);
                 }
 
-                var dto = enderecoService.BuscarEndereco(funcionario.Endereco.Cep).Result;
-                Endereco endereco = new()
-                {
-                    Rua = dto.Rua,
-                    Numero = funcionario.Endereco.Numero,
-                    Cep = dto.Cep,
-                    Bairro = dto.Bairro,
-                    Cidade = dto.Cidade,
-                    Uf = dto.Uf,
-                    Complemento = funcionario.Endereco.Complemento
-                };
-                funcionario.Endereco = endereco;
-
                 var param = new
                 {
                     funcionario.Id,
@@ -251,22 +238,37 @@ namespace Paytech.Repositories
                     funcionario.CarteiraTrabalho.UFCarteira,
                     funcionario.Funcao,
                     funcionario.Estado_civil,
-                    endereco.Rua,
-                    endereco.Numero,
-                    endereco.Cep,
-                    endereco.Bairro,
-                    endereco.Cidade,
-                    endereco.Uf,
-                    endereco.Complemento
+                    funcionario.Endereco.Rua,
+                    funcionario.Endereco.Numero,
+                    funcionario.Endereco.Cep,
+                    funcionario.Endereco.Bairro,
+                    funcionario.Endereco.Cidade,
+                    funcionario.Endereco.Uf,
+                    funcionario.Endereco.Complemento
                 };
 
                 using var db = new SqlConnection(configuration.GetConnectionString("sql"));
                 db.Execute(Funcionario.UPDATE, param);
+
+                if (funcionario.Id > 0)
+                {
+                    var func = GetById((int)funcionario.Id);
+                    return new Retorno(true, func, "Dados atualizados com sucesso.");
+                }
+                else
+                {
+                    return new Retorno(false, "Ocorreu um erro ao atualizar");
+                }
             }
             catch (SqlException ex)
             {
                 Console.WriteLine(ex.ToString());
-                throw ex;
+                return new Retorno(false, "Ocorreu um erro ao atualizar: " + ex.Message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return new Retorno(false, "Ocorreu um erro ao atualizar: " + ex.Message);
             }
         }
         public void Delete(int id)

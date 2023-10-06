@@ -40,9 +40,9 @@ namespace Paytech.Services
             return _funcionarioRepository.GetByName(name);
         }
 
-        public void AlterarFuncionario(Funcionario funcionario)
+        public Task<Retorno> AlterarFuncionario(Funcionario funcionario)
         {
-            _funcionarioRepository.AlterarFuncionario(funcionario);
+            return _funcionarioRepository.AlterarFuncionario(funcionario);
         }
 
         public Funcionario GetById(int id)
