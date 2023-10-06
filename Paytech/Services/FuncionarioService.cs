@@ -1,5 +1,6 @@
 ﻿using Paytech.Models;
 using Paytech.Repositories;
+using Paytech.Utils;
 
 namespace Paytech.Services
 {
@@ -19,7 +20,7 @@ namespace Paytech.Services
             _funcionarioRepository = new FuncionarioRepository();
         }
 
-        public Task<Funcionario> Insert(Funcionario funcionario)
+        public Task<Retorno> Insert(Funcionario funcionario)
         {
             return _funcionarioRepository.Insert(funcionario);
         }

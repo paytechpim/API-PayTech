@@ -13,7 +13,8 @@
             @Nome, @Cpf, @Rg, @Escolaridade, @Forma_pagamento, @Salario, @Telefone, @Genero, @Naturalidade, @Num_reservista,
             @nome_mae, @nome_pai, @dt_admissao, @dt_nascimento, @dt_FGTS, @Numero_Titulo, @Num_cnh, @NumCtps, @UFCarteira, @Funcao, @estado_civil,
             @rua, @numero, @cep, @bairro, @cidade, @uf, @complemento
-        )";
+        ); SELECT SCOPE_IDENTITY();
+        ";
         public static readonly string SELECT_BY_NAME = "SELECT * FROM Funcionario WHERE nome LIKE @Nome";
         public static readonly string SELECT_BY_ID = "SELECT * FROM Funcionario WHERE ID = @Id";
         public static readonly string UPDATE = @"

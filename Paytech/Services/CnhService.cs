@@ -30,9 +30,9 @@ namespace Paytech.Services
         {
             _cnhRepository.AlterarCnh(cnh);
         }
-        public void Delete(string username)
+        public void Delete(string num_cnh)
         {
-            _cnhRepository.Delete(username);
+            _cnhRepository.Delete(num_cnh);
         }
 
     }

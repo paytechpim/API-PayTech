@@ -1,10 +1,13 @@
 ﻿using Dapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Paytech.Controllers;
 using Paytech.Models;
 using Paytech.Services;
+using Paytech.Utils;
+using System;
 using System.Net;
 using System.Reflection.Metadata;
 
@@ -18,26 +21,35 @@ namespace Paytech.Repositories
             .AddJsonFile("appsettings.json")
             .Build();
 
-        public async Task<Funcionario> Insert(Funcionario funcionario)
+        public async Task<Retorno> Insert(Funcionario funcionario)
         {
             try
             {
-                var cnhService = new CnhService();
-                var cnh = cnhService.GetByNumCnh(funcionario.Cnh.Num_cnh);
-                cnh ??= await cnhService.Insert(funcionario.Cnh);
-                funcionario.Cnh = cnh;
+                if (!string.IsNullOrEmpty(funcionario?.Cnh?.Num_cnh))
+                {
+                    var cnhService = new CnhService();
+                    var cnh = cnhService.GetByNumCnh(funcionario.Cnh.Num_cnh);
+                    cnh ??= await cnhService.Insert(funcionario.Cnh);
+                    funcionario.Cnh = cnh;
+                }
 
-                var tituloService = new TituloEleitorService();
-                var titulo = tituloService.GetByTitulo(funcionario.TituloEleitor.Numero_Titulo);
-                titulo ??= await tituloService.Insert(funcionario.TituloEleitor);
-                funcionario.TituloEleitor = titulo;
+                if (!string.IsNullOrEmpty(funcionario?.TituloEleitor?.Numero_Titulo))
+                {
+                    var tituloService = new TituloEleitorService();
+                    var titulo = tituloService.GetByTitulo(funcionario.TituloEleitor.Numero_Titulo);
+                    titulo ??= await tituloService.Insert(funcionario.TituloEleitor);
+                    funcionario.TituloEleitor = titulo;
+                }
 
-                var carteiraService = new CarteiraTrabalhoService();
-                var carteira = carteiraService.GetById(funcionario.CarteiraTrabalho.NumCtps, funcionario.CarteiraTrabalho.UFCarteira);
-                carteira ??= await carteiraService.Insert(funcionario.CarteiraTrabalho);
-                funcionario.CarteiraTrabalho = carteira;
+                if (!string.IsNullOrEmpty(funcionario?.CarteiraTrabalho?.NumCtps) && !string.IsNullOrEmpty(funcionario?.CarteiraTrabalho?.UFCarteira))
+                {
+                    var carteiraService = new CarteiraTrabalhoService();
+                    var carteira = carteiraService.GetById(funcionario.CarteiraTrabalho.NumCtps, funcionario.CarteiraTrabalho.UFCarteira);
+                    carteira ??= await carteiraService.Insert(funcionario.CarteiraTrabalho);
+                    funcionario.CarteiraTrabalho = carteira;
+                }
 
-                if(funcionario.Endereco.Cep != "")
+                if(!string.IsNullOrEmpty(funcionario.Endereco.Cep))
                 {
                     var enderecoService = new EnderecoService();
                     var dto = enderecoService.BuscarEndereco(funcionario.Endereco.Cep).Result;
@@ -86,13 +98,27 @@ namespace Paytech.Repositories
                     funcionario.Endereco.Uf,
                     funcionario.Endereco.Complemento
                 };
-                db.Execute(Funcionario.INSERT, param);
-                return funcionario;
+                int id = db.Query<int>(Funcionario.INSERT, param).Single();
+
+                if(id > 0)
+                {
+                    var func = GetById(id);
+                    return new Retorno(true, func, "Dados inseridos com sucesso.");
+                }
+                else
+                {
+                    return new Retorno(false, "Ocorreu um erro ao inserir");
+                }
             }
             catch (SqlException ex)
             {
                 Console.WriteLine(ex.ToString());
-                throw ex;
+                return new Retorno(false, "Ocorreu um erro ao inserir: " + ex.Message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return new Retorno(false, "Ocorreu um erro ao inserir: " + ex.Message);
             }
 
         }
@@ -120,11 +146,14 @@ namespace Paytech.Repositories
                 using var db = new SqlConnection(configuration.GetConnectionString("sql"));
                 var selectFunc = db.QueryFirstOrDefault(Funcionario.SELECT_BY_ID, new { Id = id });
 
-                funcionario = JsonConvert.DeserializeObject<Funcionario>(JsonConvert.SerializeObject(selectFunc));
-                funcionario.Cnh = new CnhService().GetByNumCnh(selectFunc.num_CNH);
-                funcionario.TituloEleitor = new TituloEleitorService().GetByTitulo(selectFunc.numero_titulo);
-                funcionario.CarteiraTrabalho = new CarteiraTrabalhoService().GetById(selectFunc.NumCtps, selectFunc.UFCarteira);
-                funcionario.Endereco = JsonConvert.DeserializeObject<Endereco>(JsonConvert.SerializeObject(selectFunc));
+                if(selectFunc?.ID > 0)
+                {
+                    funcionario = JsonConvert.DeserializeObject<Funcionario>(JsonConvert.SerializeObject(selectFunc));
+                    funcionario.Cnh = !string.IsNullOrEmpty(funcionario?.Cnh?.Num_cnh) ? new CnhService().GetByNumCnh(selectFunc.num_CNH) : new Cnh();
+                    funcionario.TituloEleitor = !string.IsNullOrEmpty(funcionario?.TituloEleitor?.Numero_Titulo) ? new TituloEleitorService().GetByTitulo(selectFunc.numero_titulo) : new TituloEleitor();
+                    funcionario.CarteiraTrabalho = !string.IsNullOrEmpty(funcionario?.CarteiraTrabalho?.NumCtps) && !string.IsNullOrEmpty(funcionario?.CarteiraTrabalho?.UFCarteira) ? new CarteiraTrabalhoService().GetById(selectFunc.NumCtps, selectFunc.UFCarteira) : new CarteiraTrabalho();
+                    funcionario.Endereco = JsonConvert.DeserializeObject<Endereco>(JsonConvert.SerializeObject(selectFunc));
+                }
 
                 return funcionario;
             }
@@ -244,15 +273,19 @@ namespace Paytech.Repositories
         {
             try
             {
-                var carteiraTrabalhoService = new CarteiraTrabalhoService();
-                var cnhService = new CnhService();
-                var tituloEleitorService = new TituloEleitorService();
                 var funcionario = GetById(id);
-                carteiraTrabalhoService.Delete(funcionario.CarteiraTrabalho.NumCtps, funcionario.CarteiraTrabalho.UFCarteira);
-                cnhService.Delete(funcionario.Cnh.Num_cnh);
-                tituloEleitorService.Delete(funcionario.TituloEleitor.Numero_Titulo);
+
+                if (!string.IsNullOrEmpty(funcionario?.Cnh?.Num_cnh))
+                    new CnhService().Delete(funcionario.Cnh.Num_cnh);
+
+                if (!string.IsNullOrEmpty(funcionario?.TituloEleitor?.Numero_Titulo))
+                    new TituloEleitorService().Delete(funcionario.TituloEleitor.Numero_Titulo);
+
+                if (!string.IsNullOrEmpty(funcionario?.CarteiraTrabalho?.NumCtps) && !string.IsNullOrEmpty(funcionario?.CarteiraTrabalho?.UFCarteira))
+                    new CarteiraTrabalhoService().Delete(funcionario.CarteiraTrabalho.NumCtps, funcionario.CarteiraTrabalho.UFCarteira);
+                
                 using var db = new SqlConnection(configuration.GetConnectionString("sql"));
-                db.Execute(Funcionario.DELETE, funcionario);
+                db.Execute(Funcionario.DELETE, new { Id = id });
             }
             catch (SqlException ex)
             {

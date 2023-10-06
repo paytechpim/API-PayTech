@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Paytech.Models;
 using Paytech.Services;
+using Paytech.Utils;
 using System.Net;
 
 namespace Paytech.Controllers
@@ -12,17 +13,13 @@ namespace Paytech.Controllers
     {
 
         [HttpPost("Insert")]
-        public ActionResult Insert(Funcionario funcionario)
+        public async Task<Retorno> Insert(Funcionario funcionario)
         {
-            if (new FuncionarioService().Insert(funcionario) != null)
-                return StatusCode(200, funcionario);
-            else
-                return BadRequest();
+            return await new FuncionarioService().Insert(funcionario);
         }
 
 
         [HttpGet("GetAll")]
-
         public List<Funcionario> Get()
         {
             return new FuncionarioService().GetAll();

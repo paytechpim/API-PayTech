@@ -1,10 +1,11 @@
 ﻿using Paytech.Models;
+using Paytech.Utils;
 
 namespace Paytech.Repositories
 {
     public interface IFuncionarioRepository
     {
-            Task<Funcionario> Insert(Funcionario funcionario);
+            Task<Retorno> Insert(Funcionario funcionario);
 
             Funcionario GetById(int id);
 
