@@ -27,16 +27,16 @@ namespace Paytech.Controllers
 
         [HttpGet("GetByName")]
 
-        public List<Funcionario> GetByName(string nome)
+        public async Task<Retorno> GetByName(string nome)
         {
-            return new FuncionarioService().GetByName(nome);
+            return await new FuncionarioService().GetByName(nome);
         }
 
         [HttpGet("GetById")]
 
-        public Funcionario GetById(int id)
+        public async Task<Retorno> GetById(int id)
         {
-            return new FuncionarioService().GetById(id);
+            return await new FuncionarioService().GetById(id);
         }
 
         [HttpPut("Update")]
@@ -47,19 +47,9 @@ namespace Paytech.Controllers
 
 
         [HttpDelete("Delete")]
-        public ActionResult Delete(int id)
+        public async Task<Retorno> Delete(int id)
         {
-            try
-            {
-            var funcionario = new FuncionarioService().GetById(id);
-            if (funcionario == null) return NotFound("Funcionário não encontrado!");
-            new FuncionarioService().Delete(id);
-            return StatusCode(200, funcionario);
-            }
-            catch (BadHttpRequestException ex)
-            {
-                return NotFound(ex.Message);
-            }
+            return await new FuncionarioService().Delete(id);
         }
 
     }

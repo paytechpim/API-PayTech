@@ -137,7 +137,7 @@ namespace Paytech.Repositories
             }
         }
 
-        public Funcionario GetById(int id)
+        public async Task<Retorno> GetById(int id)
         {
             try
                 {
@@ -155,27 +155,55 @@ namespace Paytech.Repositories
                     funcionario.Endereco = JsonConvert.DeserializeObject<Endereco>(JsonConvert.SerializeObject(selectFunc));
                 }
 
-                return funcionario;
+                return new Retorno(true, funcionario, "Dados pesquisado com sucesso.");
             }
             catch (SqlException ex)
             {
                 Console.WriteLine(ex.ToString());
-                throw ex;
+                return new Retorno(false, "Ocorreu um erro ao pesquisar: " + ex.Message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return new Retorno(false, "Ocorreu um erro ao pesquisar: " + ex.Message);
             }
         }
 
-        public List<Funcionario> GetByName(string nome)
+        public async Task<Retorno> GetByName(string nome)
         {
             nome = "%" + nome + "%";
             try
             {
                 using var db = new SqlConnection(configuration.GetConnectionString("sql"));
-                return db.Query<Funcionario>(Funcionario.SELECT_BY_NAME, new { Nome = nome }).AsList();
+
+                List<Funcionario> funcionarios = new List<Funcionario>();
+
+                foreach(var item in db.Query(Funcionario.SELECT_BY_NAME, new { Nome = nome }).AsList())
+                {
+                    var funcionario = new Funcionario();
+                    if (item?.ID > 0)
+                    {
+                        funcionario = JsonConvert.DeserializeObject<Funcionario>(JsonConvert.SerializeObject(item));
+                        funcionario.Cnh = !string.IsNullOrEmpty(item.num_CNH) ? new CnhService().GetByNumCnh(item.num_CNH) : new Cnh();
+                        funcionario.TituloEleitor = !string.IsNullOrEmpty(item.numero_titulo) ? new TituloEleitorService().GetByTitulo(item.numero_titulo) : new TituloEleitor();
+                        funcionario.CarteiraTrabalho = !string.IsNullOrEmpty(item.NumCtps) && !string.IsNullOrEmpty(item.UFCarteira) ? new CarteiraTrabalhoService().GetById(item.NumCtps, item.UFCarteira) : new CarteiraTrabalho();
+                        funcionario.Endereco = JsonConvert.DeserializeObject<Endereco>(JsonConvert.SerializeObject(item));
+                    }
+
+                    funcionarios.Add(funcionario);
+                }
+
+                return new Retorno(true, funcionarios, "Dados pesquisado com sucesso.");
             }
             catch (SqlException ex)
             {
                 Console.WriteLine(ex.ToString());
-                throw ex;
+                return new Retorno(false, "Ocorreu um erro ao pesquisar: " + ex.Message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return new Retorno(false, "Ocorreu um erro ao pesquisar: " + ex.Message);
             }
         }
         public async Task<Retorno> AlterarFuncionario(Funcionario funcionario)
@@ -252,7 +280,7 @@ namespace Paytech.Repositories
 
                 if (funcionario.Id > 0)
                 {
-                    var func = GetById((int)funcionario.Id);
+                    var func = GetById((int)funcionario.Id).Result.Dados;
                     return new Retorno(true, func, "Dados atualizados com sucesso.");
                 }
                 else
@@ -271,28 +299,44 @@ namespace Paytech.Repositories
                 return new Retorno(false, "Ocorreu um erro ao atualizar: " + ex.Message);
             }
         }
-        public void Delete(int id)
+
+        public async Task<Retorno> Delete(int id)
         {
             try
             {
-                var funcionario = GetById(id);
-
-                if (!string.IsNullOrEmpty(funcionario?.Cnh?.Num_cnh))
-                    new CnhService().Delete(funcionario.Cnh.Num_cnh);
-
-                if (!string.IsNullOrEmpty(funcionario?.TituloEleitor?.Numero_Titulo))
-                    new TituloEleitorService().Delete(funcionario.TituloEleitor.Numero_Titulo);
-
-                if (!string.IsNullOrEmpty(funcionario?.CarteiraTrabalho?.NumCtps) && !string.IsNullOrEmpty(funcionario?.CarteiraTrabalho?.UFCarteira))
-                    new CarteiraTrabalhoService().Delete(funcionario.CarteiraTrabalho.NumCtps, funcionario.CarteiraTrabalho.UFCarteira);
-                
                 using var db = new SqlConnection(configuration.GetConnectionString("sql"));
-                db.Execute(Funcionario.DELETE, new { Id = id });
+                var funcionario = db.QueryFirstOrDefault(Funcionario.SELECT_BY_ID, new { Id = id });
+
+                if (!string.IsNullOrEmpty(funcionario?.num_CNH))
+                    new CnhService().Delete(funcionario.num_CNH);
+
+                if (!string.IsNullOrEmpty(funcionario?.numero_titulo))
+                    new TituloEleitorService().Delete(funcionario.numero_titulo);
+
+                if (!string.IsNullOrEmpty(funcionario?.NumCtps) && !string.IsNullOrEmpty(funcionario?.UFCarteira))
+                    new CarteiraTrabalhoService().Delete(funcionario.NumCtps, funcionario.UFCarteira);
+                
+                var qtd = db.Execute(Funcionario.DELETE, new { Id = id });
+
+                if(qtd > 0)
+                {
+                    return new Retorno(true, "Registro deletado com sucesso");
+                }
+                else
+                {
+                    return new Retorno(false, "Registro não encontrado");
+                }
+                
             }
             catch (SqlException ex)
             {
                 Console.WriteLine(ex.ToString());
-                throw ex;
+                return new Retorno(false, "Ocorreu um erro ao atualizar: " + ex.Message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return new Retorno(false, "Ocorreu um erro ao atualizar: " + ex.Message);
             }
         }
 

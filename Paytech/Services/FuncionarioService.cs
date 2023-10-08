@@ -25,9 +25,9 @@ namespace Paytech.Services
             return _funcionarioRepository.Insert(funcionario);
         }
 
-        public void Delete(int id)
+        public Task<Retorno> Delete(int id)
         {
-            _funcionarioRepository.Delete(id);
+            return _funcionarioRepository.Delete(id);
         }
 
         public List<Funcionario> GetAll()
@@ -35,7 +35,7 @@ namespace Paytech.Services
             return _funcionarioRepository.GetAll();
         }
 
-        public List<Funcionario> GetByName(string name)
+        public Task<Retorno> GetByName(string name)
         {
             return _funcionarioRepository.GetByName(name);
         }
@@ -45,7 +45,7 @@ namespace Paytech.Services
             return _funcionarioRepository.AlterarFuncionario(funcionario);
         }
 
-        public Funcionario GetById(int id)
+        public Task<Retorno> GetById(int id)
         {
             return _funcionarioRepository.GetById(id);
         }

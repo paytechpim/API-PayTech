@@ -7,14 +7,15 @@ namespace Paytech.Repositories
     {
             Task<Retorno> Insert(Funcionario funcionario);
 
-            Funcionario GetById(int id);
+            Task<Retorno> GetById(int id);
 
-            List<Funcionario> GetByName(string name);
+            Task<Retorno> GetByName(string name);
 
             List<Funcionario> GetAll();
+
             Task<Retorno> AlterarFuncionario(Funcionario funcionario);
 
-            void Delete(int id);
+            Task<Retorno> Delete(int id);
         }
     }
 
