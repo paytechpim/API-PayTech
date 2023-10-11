@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Paytech.Models;
 using Paytech.Services;
+using Paytech.Utils;
 using System;
 using System.Runtime.CompilerServices;
 
@@ -74,12 +75,9 @@ namespace Paytech.Controllers
         }
 
         [HttpPost(Name = "Insert")]
-        public ActionResult Insert(Login login)
+        public async Task<Retorno> Insert(Login login)
         {
-            if (new LoginService().Insert(login))
-                return StatusCode(200);
-            else
-                return BadRequest();
+            return await new LoginService().Insert(login);
         }
 
         [HttpDelete(Name = "Delete")]
@@ -87,6 +85,30 @@ namespace Paytech.Controllers
         {
             new LoginService().Delete(username);
             return NoContent();
+        }
+
+        [HttpPut("Update")]
+        public async Task<Retorno> AlterarLogin(Login login)
+        {
+            return await new LoginService().AlterarLogin(login);
+        }
+
+        [HttpGet("GetByFuncionario")]
+        public async Task<Retorno> GetByFuncionario(int id_funcionario)
+        {
+            return await new LoginService().GetByFuncionario(id_funcionario);
+        }
+
+        [HttpGet("IsUserNameExist")]
+        public async Task<Retorno> IsUserNameExist(string username)
+        {
+            return await new LoginService().IsUserNameExist(username);
+        }
+
+        [HttpGet("GetById")]
+        public async Task<Retorno> GetById(int id)
+        {
+            return await new LoginService().GetById(id);
         }
     }
 }

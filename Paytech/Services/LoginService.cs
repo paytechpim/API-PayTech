@@ -1,5 +1,6 @@
 ﻿using Paytech.Models;
 using Paytech.Repositories;
+using Paytech.Utils;
 
 namespace Paytech.Services
 {
@@ -12,7 +13,7 @@ namespace Paytech.Services
             _loginRepository = new LoginRepository();
         }
 
-        public bool Insert(Login login)
+        public Task<Retorno> Insert(Login login)
         {
             return _loginRepository.Insert(login);
         }
@@ -32,11 +33,31 @@ namespace Paytech.Services
             return _loginRepository.GetByUsername(username);
         }
 
+        public Task<Retorno> GetById(int Id)
+        {
+            return _loginRepository.GetById(Id);
+        }
+
+        public Task<Retorno> AlterarLogin(Login login)
+        {
+            return _loginRepository.AlterarLogin(login);
+        }
+
+        public Task<Retorno> GetByFuncionario(int Id_Funcionario)
+        {
+            return _loginRepository.GetByFuncionario(Id_Funcionario);
+        }
+
+        public Task<Retorno> IsUserNameExist(string Nome_Usuario)
+        {
+            return _loginRepository.IsUserNameExist(Nome_Usuario);
+        }
+
         public async Task<bool> AuthenticateAsync(string username, string senha)
         {
             Login login = _loginRepository.GetByUsername(username);
 
-            if (login != null && IsValidPassword(login, senha))
+            if (login != null && IsValidPassword(login, senha) && login?.Ativo == true)
             {
                 return true;
             }
@@ -47,14 +68,14 @@ namespace Paytech.Services
         {
             Login login = _loginRepository.GetByUsername(username);
 
-            if (login != null && IsValidPassword(login, senha))
+            if (login != null && IsValidPassword(login, senha) && login?.Ativo == true)
             {
                 return login;
             }
             return null;
         }
 
-        private bool IsValidPassword(Login login, string password)
+        private bool IsValidPassword(Login? login, string? password)
         {
             return login.Senha == password;
         }
