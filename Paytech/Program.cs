@@ -1,8 +1,7 @@
-using static Dapper.SqlMapper;
-using System.Text;
-using Paytech;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Paytech;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -53,6 +53,15 @@ namespace Paytech.Services
             return _loginRepository.IsUserNameExist(Nome_Usuario);
         }
 
+        public Task<Retorno> IsPrimeiroAcesso(int Id_Funcionario)
+        {
+            return _loginRepository.IsPrimeiroAcesso(Id_Funcionario);
+        }
+        public Task<Retorno> AlterarLoginPrimeiroAcesso(string senha, int Id_Funcionario)
+        {
+            return _loginRepository.AlterarLoginPrimeiroAcesso(senha, Id_Funcionario);
+        }
+
         public async Task<bool> AuthenticateAsync(string username, string senha)
         {
             Login login = _loginRepository.GetByUsername(username);

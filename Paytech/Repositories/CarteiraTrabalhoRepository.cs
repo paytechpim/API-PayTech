@@ -61,8 +61,8 @@ namespace Paytech.Repositories
         {
             try
             {
-                    using var db = new SqlConnection(configuration.GetConnectionString("sql"));
-                    db.Execute(CarteiraTrabalho.UPDATE, carteiraTrabalho);
+                using var db = new SqlConnection(configuration.GetConnectionString("sql"));
+                db.Execute(CarteiraTrabalho.UPDATE, carteiraTrabalho);
             }
             catch (SqlException ex)
             {

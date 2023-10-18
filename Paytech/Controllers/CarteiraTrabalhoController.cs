@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Paytech.Models;
 using Paytech.Services;
 
@@ -126,7 +125,7 @@ namespace Paytech.Controllers
         "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA", "MT", "MS", "MG", "PA",
         "PB", "PR", "PE", "PI", "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO"
     };
-            return ufsValidas.Contains(uf.ToUpper()); 
+            return ufsValidas.Contains(uf.ToUpper());
         }
     }
 }

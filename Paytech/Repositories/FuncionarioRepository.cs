@@ -1,15 +1,10 @@
 ﻿using Dapper;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
-using Paytech.Controllers;
 using Paytech.Models;
 using Paytech.Services;
 using Paytech.Utils;
-using System;
-using System.Net;
-using System.Reflection.Metadata;
 
 namespace Paytech.Repositories
 {
@@ -41,30 +36,14 @@ namespace Paytech.Repositories
                     funcionario.TituloEleitor = titulo;
                 }
 
-                if (!string.IsNullOrEmpty(funcionario?.CarteiraTrabalho?.NumCtps) && !string.IsNullOrEmpty(funcionario?.CarteiraTrabalho?.UFCarteira))
+                if (!string.IsNullOrEmpty("" + funcionario?.InformacoesTrabalhistas?.ID))
                 {
-                    var carteiraService = new CarteiraTrabalhoService();
-                    var carteira = carteiraService.GetById(funcionario.CarteiraTrabalho.NumCtps, funcionario.CarteiraTrabalho.UFCarteira);
-                    carteira ??= await carteiraService.Insert(funcionario.CarteiraTrabalho);
-                    funcionario.CarteiraTrabalho = carteira;
+                    var infoService = new InformacoesTrabalhistasService();
+                    var get = infoService.GetById((int)funcionario.InformacoesTrabalhistas.ID);
+                    var infoTrab = get.Result.Dados;
+                    infoTrab ??= infoService.Insert(funcionario.InformacoesTrabalhistas).Result.Dados;
+                    funcionario.InformacoesTrabalhistas = (InformacoesTrabalhistas)infoTrab;
                 }
-
-                //if(!string.IsNullOrEmpty(funcionario.Endereco.Cep))
-                //{
-                //    var enderecoService = new EnderecoService();
-                //    var dto = enderecoService.BuscarEndereco(funcionario.Endereco.Cep).Result;
-                //    Endereco endereco = new()
-                //    {
-                //        Rua = dto.Rua,
-                //        Numero = funcionario.Endereco.Numero,
-                //        Cep = dto.Cep,
-                //        Bairro = dto.Bairro,
-                //        Cidade = dto.Cidade,
-                //        Uf = dto.Uf,
-                //        Complemento = funcionario.Endereco.Complemento
-                //    };
-                //    funcionario.Endereco = endereco;
-                //}
 
                 using var db = new SqlConnection(configuration.GetConnectionString("sql"));
                 var param = new
@@ -73,22 +52,15 @@ namespace Paytech.Repositories
                     funcionario.Cpf,
                     funcionario.Rg,
                     funcionario.Escolaridade,
-                    funcionario.Forma_pagamento,
-                    funcionario.Salario,
                     funcionario.Telefone,
                     funcionario.Genero,
                     funcionario.Naturalidade,
                     funcionario.Num_reservista,
                     funcionario.Nome_mae,
                     funcionario.Nome_pai,
-                    funcionario.Dt_admissao,
                     funcionario.Dt_nascimento,
-                    funcionario.Dt_FGTS,
                     funcionario.TituloEleitor.Numero_Titulo,
                     funcionario.Cnh.Num_cnh,
-                    funcionario.CarteiraTrabalho.NumCtps,
-                    funcionario.CarteiraTrabalho.UFCarteira,
-                    funcionario.Funcao,
                     funcionario.Estado_civil,
                     funcionario.Endereco.Rua,
                     funcionario.Endereco.Numero,
@@ -96,13 +68,14 @@ namespace Paytech.Repositories
                     funcionario.Endereco.Bairro,
                     funcionario.Endereco.Cidade,
                     funcionario.Endereco.Uf,
-                    funcionario.Endereco.Complemento
+                    funcionario.Endereco.Complemento,
+                    Id_trabalhista = funcionario.InformacoesTrabalhistas.ID
                 };
                 int id = db.Query<int>(Funcionario.INSERT, param).Single();
 
-                if(id > 0)
+                if (id > 0)
                 {
-                    var func = GetById(id);
+                    var func = GetById(id).Result.Dados;
                     return new Retorno(true, func, "Dados inseridos com sucesso.");
                 }
                 else
@@ -140,18 +113,18 @@ namespace Paytech.Repositories
         public async Task<Retorno> GetById(int id)
         {
             try
-                {
+            {
                 Funcionario funcionario = new Funcionario();
 
                 using var db = new SqlConnection(configuration.GetConnectionString("sql"));
                 var selectFunc = db.QueryFirstOrDefault(Funcionario.SELECT_BY_ID, new { Id = id });
 
-                if(selectFunc?.ID > 0)
+                if (selectFunc?.ID > 0)
                 {
                     funcionario = JsonConvert.DeserializeObject<Funcionario>(JsonConvert.SerializeObject(selectFunc));
                     funcionario.Cnh = !string.IsNullOrEmpty(selectFunc.num_CNH) ? new CnhService().GetByNumCnh(selectFunc.num_CNH) : new Cnh();
                     funcionario.TituloEleitor = !string.IsNullOrEmpty(selectFunc.numero_titulo) ? new TituloEleitorService().GetByTitulo(selectFunc.numero_titulo) : new TituloEleitor();
-                    funcionario.CarteiraTrabalho = !string.IsNullOrEmpty(selectFunc.NumCtps) && !string.IsNullOrEmpty(selectFunc.UFCarteira) ? new CarteiraTrabalhoService().GetById(selectFunc.NumCtps, selectFunc.UFCarteira) : new CarteiraTrabalho();
+                    funcionario.InformacoesTrabalhistas = selectFunc.id_trabalhista > 0 ? new InformacoesTrabalhistasService().GetById(selectFunc.id_trabalhista).Result.Dados : new InformacoesTrabalhistas();
                     funcionario.Endereco = JsonConvert.DeserializeObject<Endereco>(JsonConvert.SerializeObject(selectFunc));
                 }
 
@@ -178,7 +151,7 @@ namespace Paytech.Repositories
 
                 List<Funcionario> funcionarios = new List<Funcionario>();
 
-                foreach(var item in db.Query(Funcionario.SELECT_BY_NAME, new { Nome = nome }).AsList())
+                foreach (var item in db.Query(Funcionario.SELECT_BY_NAME, new { Nome = nome }).AsList())
                 {
                     var funcionario = new Funcionario();
                     if (item?.ID > 0)
@@ -186,7 +159,7 @@ namespace Paytech.Repositories
                         funcionario = JsonConvert.DeserializeObject<Funcionario>(JsonConvert.SerializeObject(item));
                         funcionario.Cnh = !string.IsNullOrEmpty(item.num_CNH) ? new CnhService().GetByNumCnh(item.num_CNH) : new Cnh();
                         funcionario.TituloEleitor = !string.IsNullOrEmpty(item.numero_titulo) ? new TituloEleitorService().GetByTitulo(item.numero_titulo) : new TituloEleitor();
-                        funcionario.CarteiraTrabalho = !string.IsNullOrEmpty(item.NumCtps) && !string.IsNullOrEmpty(item.UFCarteira) ? new CarteiraTrabalhoService().GetById(item.NumCtps, item.UFCarteira) : new CarteiraTrabalho();
+                        funcionario.InformacoesTrabalhistas = item.id_trabalhista > 0 ? new InformacoesTrabalhistasService().GetById(item.id_trabalhista).Result.Dados : new InformacoesTrabalhistas();
                         funcionario.Endereco = JsonConvert.DeserializeObject<Endereco>(JsonConvert.SerializeObject(item));
                     }
 
@@ -210,18 +183,18 @@ namespace Paytech.Repositories
         {
             try
             {
-                var carteiraTrabalhoService = new CarteiraTrabalhoService();
+                var informacoesTrabalhistasService = new InformacoesTrabalhistasService();
                 var cnhService = new CnhService();
                 var tituloEleitorService = new TituloEleitorService();
                 var enderecoService = new EnderecoService();
 
-                if(carteiraTrabalhoService.GetById(funcionario.CarteiraTrabalho.NumCtps, funcionario.CarteiraTrabalho.UFCarteira)  == null)
+                if (informacoesTrabalhistasService.GetById((int)funcionario.InformacoesTrabalhistas.ID).Result.Dados == null)
                 {
-                    carteiraTrabalhoService.Insert(funcionario.CarteiraTrabalho);
+                    informacoesTrabalhistasService.Insert(funcionario.InformacoesTrabalhistas);
                 }
                 else
                 {
-                    carteiraTrabalhoService.AlterarCarteira(funcionario.CarteiraTrabalho);
+                    informacoesTrabalhistasService.Update(funcionario.InformacoesTrabalhistas);
                 }
 
                 if (cnhService.GetByNumCnh(funcionario.Cnh.Num_cnh) == null)
@@ -249,22 +222,15 @@ namespace Paytech.Repositories
                     funcionario.Cpf,
                     funcionario.Rg,
                     funcionario.Escolaridade,
-                    funcionario.Forma_pagamento,
-                    funcionario.Salario,
                     funcionario.Telefone,
                     funcionario.Genero,
                     funcionario.Naturalidade,
                     funcionario.Num_reservista,
                     funcionario.Nome_mae,
                     funcionario.Nome_pai,
-                    funcionario.Dt_admissao,
                     funcionario.Dt_nascimento,
-                    funcionario.Dt_FGTS,
                     funcionario.TituloEleitor.Numero_Titulo,
                     funcionario.Cnh.Num_cnh,
-                    funcionario.CarteiraTrabalho.NumCtps,
-                    funcionario.CarteiraTrabalho.UFCarteira,
-                    funcionario.Funcao,
                     funcionario.Estado_civil,
                     funcionario.Endereco.Rua,
                     funcionario.Endereco.Numero,
@@ -272,7 +238,8 @@ namespace Paytech.Repositories
                     funcionario.Endereco.Bairro,
                     funcionario.Endereco.Cidade,
                     funcionario.Endereco.Uf,
-                    funcionario.Endereco.Complemento
+                    funcionario.Endereco.Complemento,
+                    funcionario.InformacoesTrabalhistas.ID
                 };
 
                 using var db = new SqlConnection(configuration.GetConnectionString("sql"));
@@ -313,12 +280,12 @@ namespace Paytech.Repositories
                 if (!string.IsNullOrEmpty(funcionario?.numero_titulo))
                     new TituloEleitorService().Delete(funcionario.numero_titulo);
 
-                if (!string.IsNullOrEmpty(funcionario?.NumCtps) && !string.IsNullOrEmpty(funcionario?.UFCarteira))
-                    new CarteiraTrabalhoService().Delete(funcionario.NumCtps, funcionario.UFCarteira);
-                
+                if (!string.IsNullOrEmpty(funcionario?.id_trabalhista))
+                    new InformacoesTrabalhistasService().Delete(funcionario.id_trabalhista);
+
                 var qtd = db.Execute(Funcionario.DELETE, new { Id = id });
 
-                if(qtd > 0)
+                if (qtd > 0)
                 {
                     return new Retorno(true, "Registro deletado com sucesso");
                 }
@@ -326,7 +293,7 @@ namespace Paytech.Repositories
                 {
                     return new Retorno(false, "Registro não encontrado");
                 }
-                
+
             }
             catch (SqlException ex)
             {

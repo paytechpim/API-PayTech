@@ -1,7 +1,6 @@
 ﻿using Dapper;
 using Microsoft.Data.SqlClient;
 using Paytech.Models;
-using System.Runtime.CompilerServices;
 
 namespace Paytech.Repositories
 {

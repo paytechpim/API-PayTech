@@ -1,12 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Paytech.Models;
 using Paytech.Services;
 using Paytech.Utils;
-using System;
-using System.Runtime.CompilerServices;
 
 namespace Paytech.Controllers
 {
@@ -109,6 +106,18 @@ namespace Paytech.Controllers
         public async Task<Retorno> GetById(int id)
         {
             return await new LoginService().GetById(id);
+        }
+
+        [HttpGet("IsPrimeiroAcesso")]
+        public async Task<Retorno> IsPrimeiroAcesso(int Id_Funcionario)
+        {
+            return await new LoginService().IsPrimeiroAcesso(Id_Funcionario);
+        }
+
+        [HttpGet("AlterarLoginPrimeiroAcesso")]
+        public async Task<Retorno> AlterarLoginPrimeiroAcesso(string senha, int Id_Funcionario)
+        {
+            return await new LoginService().AlterarLoginPrimeiroAcesso(senha, Id_Funcionario);
         }
     }
 }

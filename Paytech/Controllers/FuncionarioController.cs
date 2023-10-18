@@ -1,9 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Paytech.Models;
 using Paytech.Services;
 using Paytech.Utils;
-using System.Net;
 
 namespace Paytech.Controllers
 {

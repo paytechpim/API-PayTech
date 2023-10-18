@@ -20,5 +20,7 @@ namespace Paytech.Repositories
         Task<Retorno> IsUserNameExist(string Nome_Usuario);
 
         Task<Retorno> GetById(int Id);
+        Task<Retorno> IsPrimeiroAcesso(int Id_Funcionario);
+        Task<Retorno> AlterarLoginPrimeiroAcesso(string senha, int Id_Funcionario);
     }
 }

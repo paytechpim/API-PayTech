@@ -2,7 +2,7 @@
 {
     public class Cnh
     {
-            
+
         public static readonly string INSERT = "INSERT INTO Cnh (num_CNH, categoria, dt_emissao, dt_vencimento) VALUES (@num_CNH, @categoria, @dt_emissao, @dt_vencimento)";
         public static readonly string SELECT_ALL = "SELECT * FROM Cnh";
         public static readonly string SELECT_BY_ID = "SELECT * FROM Cnh WHERE num_CNH = @num_CNH";

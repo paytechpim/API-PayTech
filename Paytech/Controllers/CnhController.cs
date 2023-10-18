@@ -1,8 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Paytech.Models;
 using Paytech.Services;
-using System.Text.RegularExpressions;
 
 namespace Paytech.Controllers
 {
@@ -16,7 +14,7 @@ namespace Paytech.Controllers
             if (UtilidadesCnh.ValidarCNH(cnh.Num_cnh) == false)
                 return StatusCode(413, "Número de cnh inválido, digite-o corretamente!");
 
-            if (new CnhService().Insert(cnh) != null) 
+            if (new CnhService().Insert(cnh) != null)
                 return StatusCode(200, cnh);
             else
                 return BadRequest();

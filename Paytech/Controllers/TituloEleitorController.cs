@@ -1,7 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Paytech.Models;
-using Paytech.Repositories;
 using Paytech.Services;
 
 namespace Paytech.Controllers
@@ -10,7 +8,7 @@ namespace Paytech.Controllers
     [ApiController]
     public class TituloEleitorController : ControllerBase
     {
-        [HttpPost("Insert")] 
+        [HttpPost("Insert")]
         public ActionResult Insert([FromBody] TituloEleitor tituloEleitor)
         {
             if (UtilidadesTituloEleitor.ValidacaoTituloEleitor(tituloEleitor.Numero_Titulo) == false)
@@ -25,16 +23,16 @@ namespace Paytech.Controllers
                 return BadRequest();
         }
 
-        [HttpGet("GetAll")] 
+        [HttpGet("GetAll")]
         public ActionResult<List<TituloEleitor>> GetAll()
         {
             return new TituloEleitorService().GetAll();
         }
 
-        [HttpGet("GetByTitulo")] 
-        public ActionResult<TituloEleitor>  GetByTitulo(string numeroTitulo)
+        [HttpGet("GetByTitulo")]
+        public ActionResult<TituloEleitor> GetByTitulo(string numeroTitulo)
         {
-            if (!UtilidadesTituloEleitor.ValidacaoTituloEleitor(numeroTitulo)) 
+            if (!UtilidadesTituloEleitor.ValidacaoTituloEleitor(numeroTitulo))
                 return StatusCode(413, "Este título não é válido, digite-o corretamente!");
 
             var titulo = new TituloEleitorService().GetByTitulo(numeroTitulo);
@@ -47,7 +45,7 @@ namespace Paytech.Controllers
         [HttpPut("Update")]
         public ActionResult<TituloEleitor> AlterarDados(TituloEleitor tituloEleitor)
         {
-            if (!UtilidadesTituloEleitor.ValidacaoTituloEleitor(tituloEleitor.Numero_Titulo)) 
+            if (!UtilidadesTituloEleitor.ValidacaoTituloEleitor(tituloEleitor.Numero_Titulo))
                 return StatusCode(413, "Este título não é válido, digite-o corretamente!");
 
             if (UtilidadesTituloEleitor.ValidacaoSecaoEZona(tituloEleitor.Secao, tituloEleitor.Zona) == false)
@@ -63,7 +61,7 @@ namespace Paytech.Controllers
         [HttpDelete("Delete")]
         public ActionResult Delete(string numeroTitulo)
         {
-            if (!UtilidadesTituloEleitor.ValidacaoTituloEleitor(numeroTitulo)) 
+            if (!UtilidadesTituloEleitor.ValidacaoTituloEleitor(numeroTitulo))
                 return StatusCode(413, "Este título não é válido, digite-o corretamente!");
 
             var titulo = new TituloEleitorService().GetByTitulo(numeroTitulo);

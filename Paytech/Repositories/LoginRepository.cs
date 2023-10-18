@@ -3,7 +3,6 @@ using Microsoft.Data.SqlClient;
 using Microsoft.IdentityModel.Tokens;
 using Paytech.Models;
 using Paytech.Utils;
-using System;
 
 namespace Paytech.Repositories
 {
@@ -134,7 +133,7 @@ namespace Paytech.Repositories
                 var rows = 0;
                 using var db = new SqlConnection(configuration.GetConnectionString("sql"));
 
-                if(login.Senha == "")
+                if (login.Senha == "")
                 {
                     rows = db.Execute(Login.UPDATE, login);
                 }
@@ -142,7 +141,7 @@ namespace Paytech.Repositories
                 {
                     rows = db.Execute(Login.UPDATE_SENHA, login);
                 }
-                
+
 
                 if (rows > 0)
                 {
@@ -163,6 +162,55 @@ namespace Paytech.Repositories
             {
                 Console.WriteLine(ex.ToString());
                 return new Retorno(false, "Ocorreu um erro ao atualizar: " + ex.Message);
+            }
+        }
+
+        public async Task<Retorno> IsPrimeiroAcesso(int Id_Funcionario)
+        {
+            try
+            {
+                using var db = new SqlConnection(configuration.GetConnectionString("sql"));
+                var dtPrimeiroAcesso = db.Query<string>(Login.SELECT_IS_PRIMEIRO_ACESSO, new { Id_Funcionario = Id_Funcionario });
+
+                return new Retorno(true, dtPrimeiroAcesso, "Dados consultados com sucesso!");
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return new Retorno(false, "Ocorreu um erro ao consultar: " + ex.Message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return new Retorno(false, "Ocorreu um erro ao consultar: " + ex.Message);
+            }
+        }
+        public async Task<Retorno> AlterarLoginPrimeiroAcesso(string senha, int Id_Funcionario)
+        {
+            try
+            {
+                using var db = new SqlConnection(configuration.GetConnectionString("sql"));
+                var rows = db.Execute(Login.UPDATE_SENHA_PRIMEIRO_ACESSO, new { Senha = senha, Id_Funcionario = Id_Funcionario });
+
+                if (rows > 0)
+                {
+                    var result = GetByFuncionario(Id_Funcionario).Result.Dados;
+                    return new Retorno(true, result, "Primeiro acesso realizado com sucesso.");
+                }
+                else
+                {
+                    return new Retorno(false, "Ocorreu um erro ao atualizar o primeiro acesso");
+                }
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return new Retorno(false, "Ocorreu um erro ao atualizar o primeiro acesso: " + ex.Message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return new Retorno(false, "Ocorreu um erro ao atualizar o primeiro acesso: " + ex.Message);
             }
         }
     }
