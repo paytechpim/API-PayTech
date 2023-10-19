@@ -51,5 +51,12 @@ namespace Paytech.Controllers
         {
             return await new HoleriteService().GerarHolerite(idFuncionario, dataCalculoSalarioMensal, percentualHoraExtra, valorValeTransporte, faltas, horaExtra);
         }
+
+        [HttpPost]
+        [Route("GerarExcel")]
+        public async Task<Retorno> GerarExcel(int IdHolerite)
+        {
+            return await new HoleriteService().gerarExcelHolerite(IdHolerite);
+        }
     }
 }

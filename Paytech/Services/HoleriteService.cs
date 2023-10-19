@@ -1,7 +1,12 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using ClosedXML.Excel;
+using Microsoft.Data.SqlClient;
+using Newtonsoft.Json;
 using Paytech.Models;
 using Paytech.Repositories;
 using Paytech.Utils;
+using System.Buffers.Text;
+using System.Data.Common;
+using System.Globalization;
 using static Dapper.SqlMapper;
 
 namespace Paytech.Services
@@ -231,6 +236,48 @@ namespace Paytech.Services
             }
 
             return descontoValetransporte;
+        }
+
+        public async Task<Retorno> gerarExcelHolerite(int IdHolerite)
+        {
+            try
+            {
+
+
+                string caminhoArquivo = AppDomain.CurrentDomain.BaseDirectory + "../../../Templete/ArquivoRelatorio.xlsx";
+                string caminhoTemplate = AppDomain.CurrentDomain.BaseDirectory + "../../../Templete/RH_Holerite.xlsx";
+
+                System.IO.File.Delete(caminhoArquivo);
+                System.IO.File.Copy(caminhoTemplate, caminhoArquivo);
+                Thread.CurrentThread.CurrentCulture = new CultureInfo("pt-BR");
+
+                using (var workbook = new XLWorkbook(caminhoArquivo))
+                {
+                    Stream spreadsheetStream = new MemoryStream();
+                    var worksheet = workbook.Worksheets.Worksheet("Sheet");
+                    var count = 0;
+                    var linhaInicioDados = 5;
+
+                    worksheet.Cell("D18").Value = "16 - Diego Cesar Domingos";
+
+                    workbook.SaveAs(spreadsheetStream);
+                    System.IO.File.Delete(caminhoArquivo);
+                    spreadsheetStream.Position = 0;
+
+                    var memoryStream = new MemoryStream();
+                    spreadsheetStream.CopyTo(memoryStream);
+
+                    byte[] bytes;
+                    bytes = memoryStream.ToArray();
+                    string base64 = Convert.ToBase64String(bytes);
+
+                    return new Retorno(true, base64, "Holerite gerado com sucesso");
+                }
+            }
+            catch (Exception ex)
+            {
+                return new Retorno(false, "Ocorreu um erro ao gerar o holerite: " + JsonConvert.SerializeObject(ex));
+            }
         }
     }
 }
