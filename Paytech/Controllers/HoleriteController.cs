@@ -39,11 +39,17 @@ namespace Paytech.Controllers
         {
             return await new HoleriteService().GetById(id);
         }
-        
+
         [HttpGet("GetByIdFuncionario")]
         public async Task<Retorno> GetByIdFuncionario(int idFuncionario)
         {
             return await new HoleriteService().GetByIdFuncionario(idFuncionario);
+        }
+
+        [HttpPost("GerarHolerite")]
+        public async Task<Retorno> GerarHolerite(int idFuncionario, DateTime dataCalculoSalarioMensal, double percentualHoraExtra, double valorValeTransporte, double faltas, double horaExtra)
+        {
+            return await new HoleriteService().GerarHolerite(idFuncionario, dataCalculoSalarioMensal, percentualHoraExtra, valorValeTransporte, faltas, horaExtra);
         }
     }
 }

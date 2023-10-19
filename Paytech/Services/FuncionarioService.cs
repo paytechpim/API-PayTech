@@ -49,6 +49,5 @@ namespace Paytech.Services
         {
             return _funcionarioRepository.GetById(id);
         }
-
     }
 }

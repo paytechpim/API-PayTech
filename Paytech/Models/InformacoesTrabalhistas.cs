@@ -33,7 +33,7 @@
         public string? Serie { get; set; }
         public string? Num_pis { get; set; }
         public DateTime? Dt_admissao { get; set; }
-        public float? Salario_Bruto { get; set; }
+        public double? Salario_Bruto { get; set; }
         public int? Qtd_Dependentes { get; set; }
         public bool? Opt_Vale_Transporte { get; set; }
         public string? funcao { get; set; }
