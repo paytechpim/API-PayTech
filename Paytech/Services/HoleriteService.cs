@@ -1,4 +1,5 @@
 ﻿using ClosedXML.Excel;
+using DocumentFormat.OpenXml;
 using Microsoft.Data.SqlClient;
 using Newtonsoft.Json;
 using Paytech.Models;
@@ -46,7 +47,7 @@ namespace Paytech.Services
             return _holeriteRepository.GetAll();
         }
 
-        public async Task<Retorno> GerarHolerite(int idFuncionario, DateTime dataCalculoSalarioMensal, double percentualHoraExtra, double valorValeTransporte, double faltas, double horaExtra)
+        public async Task<Retorno> GerarHolerite(int idFuncionario, DateTime data_inicio, DateTime data_fim, double percentualHoraExtra, double valorValeTransporte, double faltas, double horaExtra)
         {
             try {
                 var funcionario = (Funcionario)new FuncionarioService().GetById(idFuncionario).Result.Dados;
@@ -54,23 +55,27 @@ namespace Paytech.Services
 
                 resultado.Calculo_hora_extra = CalcularHoraExtra(horaExtra, (double)funcionario.InformacoesTrabalhistas.Salario_Bruto, percentualHoraExtra);
                 resultado.Desconto_faltas_horas = CalcularDescontoFaltasEmHoras(faltas, (double)funcionario.InformacoesTrabalhistas.Salario_Bruto);
-                resultado.Salario_base = CalcularSalarioMes((DateTime)funcionario.InformacoesTrabalhistas.Dt_admissao, dataCalculoSalarioMensal, (double)funcionario.InformacoesTrabalhistas.Salario_Bruto);
+                resultado.Salario_base = CalcularSalarioMes((DateTime)funcionario.InformacoesTrabalhistas.Dt_admissao, data_fim, (double)funcionario.InformacoesTrabalhistas.Salario_Bruto);
+                var salbaseHoraExtra = resultado.Salario_base + resultado.Calculo_hora_extra - resultado.Desconto_faltas_horas;
                 resultado.Salario_Base_Inss = resultado.Salario_base + resultado.Calculo_hora_extra - resultado.Desconto_faltas_horas;
                 resultado.Desconto_inss = CalcularINSS((double)resultado.Salario_base);
                 resultado.Deducao_dependente = DeducaoDependentes((int)funcionario.InformacoesTrabalhistas.Qtd_Dependentes);
-                resultado.Salario_base_ir = resultado.Salario_base - resultado.Desconto_inss - resultado.Deducao_dependente;
+                var salBaseIr = resultado.Salario_base - resultado.Desconto_inss - resultado.Deducao_dependente;
+                resultado.Salario_base_ir = salBaseIr < 0 ? 0 : salBaseIr;
                 resultado.Desconto_ir = CalcularIRRF((double)resultado.Salario_base_ir);
                 resultado.Vale_transporte = 0.0;
-                resultado.Fgts = CalcularFgts((double)resultado.Salario_base);
+                resultado.Fgts = CalcularFgts((double)salbaseHoraExtra);
+                resultado.Faixa_ir = RetornaFaixaIR((double)resultado.Salario_base_ir);
 
                 if ((bool)funcionario.InformacoesTrabalhistas.Opt_Vale_Transporte)
                 {
                     resultado.Vale_transporte = CalcularValeTransporte(valorValeTransporte, (double)funcionario.InformacoesTrabalhistas.Salario_Bruto);
                 }
 
-                resultado.Salario_liquido = resultado.Salario_base - resultado.Desconto_inss - resultado.Desconto_ir - resultado.Vale_transporte;
+                resultado.Salario_liquido = salbaseHoraExtra - resultado.Desconto_inss - resultado.Desconto_ir - resultado.Vale_transporte;
                 resultado.Id_funcionario = idFuncionario;
-                resultado.Data_competencia = dataCalculoSalarioMensal;
+                resultado.Data_competencia_Inicio = data_inicio;
+                resultado.Data_competencia_Fim = data_fim;
 
                 var retorno = Insert(resultado);
 
@@ -215,6 +220,34 @@ namespace Paytech.Services
 
             return irrf;
         }
+        
+        public double RetornaFaixaIR(double salarioBaseIR)
+        {
+            double faixa = 0.0;
+
+            if (salarioBaseIR <= 2112.00)
+            {
+                faixa = 0.0;
+            }
+            else if (salarioBaseIR <= 2826.65)
+            {
+                faixa = 7.5;
+            }
+            else if (salarioBaseIR <= 3751.05)
+            {
+                faixa = 15;
+            }
+            else if (salarioBaseIR <= 4664.68)
+            {
+                faixa = 22.5;
+            }
+            else
+            {
+                faixa = 27.5;
+            }
+
+            return faixa;
+        }
 
         public double CalcularFgts(double salarioBruto)
         {
@@ -242,7 +275,12 @@ namespace Paytech.Services
         {
             try
             {
+                var resultHolerite = GetById(IdHolerite).Result;
 
+                if (!resultHolerite.Sucesso) return new Retorno(false, "Ocorreu um erro ao gerar o holerite: Holerite não encontrado");
+
+                var holerite = (Holerite)resultHolerite.Dados;
+                var funcionario = (Funcionario)new FuncionarioService().GetById((int)holerite.Id_funcionario).Result.Dados;
 
                 string caminhoArquivo = AppDomain.CurrentDomain.BaseDirectory + "../../../Templete/ArquivoRelatorio.xlsx";
                 string caminhoTemplate = AppDomain.CurrentDomain.BaseDirectory + "../../../Templete/RH_Holerite.xlsx";
@@ -253,12 +291,83 @@ namespace Paytech.Services
 
                 using (var workbook = new XLWorkbook(caminhoArquivo))
                 {
+                    double venciamento = 0;
+                    double descontos = 0;
+
                     Stream spreadsheetStream = new MemoryStream();
                     var worksheet = workbook.Worksheets.Worksheet("Sheet");
-                    var count = 0;
-                    var linhaInicioDados = 5;
 
-                    worksheet.Cell("D18").Value = "16 - Diego Cesar Domingos";
+                    worksheet.Cell("E9").Value = "304 - teste ME";
+                    worksheet.Cell("AS9").Value = "teste";
+
+                    worksheet.Cell("AO13").Value = "" + holerite.Data_competencia_Inicio?.ToString("dd/MM/yyyy") + " a " + holerite.Data_competencia_Inicio?.ToString("dd/MM/yyyy");
+                    worksheet.Cell("X19").Value = "testeee ME";
+
+
+                    worksheet.Cell("D18").Value = funcionario.Id + " - " + funcionario.Nome;
+                    worksheet.Cell("H20").Value = funcionario.InformacoesTrabalhistas.funcao;
+
+                    worksheet.Cell("I27").Value = "Salário bruto";
+                    worksheet.Cell("AJ27").Value = holerite.Salario_base;
+                    worksheet.Cell("AJ27").Style.NumberFormat.Format = "R$ #,##0.00";
+
+                    worksheet.Cell("I30").Value = "INSS";
+                    worksheet.Cell("AV30").Value = holerite.Desconto_inss;
+                    worksheet.Cell("AV30").Style.NumberFormat.Format = "R$ #,##0.00";
+
+                    worksheet.Cell("I33").Value = "IRRF";
+                    worksheet.Cell("AV33").Value = holerite.Desconto_ir;
+                    worksheet.Cell("AV33").Style.NumberFormat.Format = "R$ #,##0.00";
+
+                    worksheet.Cell("I36").Value = "Vale transporte";
+                    worksheet.Cell("AV36").Value = holerite.Vale_transporte;
+                    worksheet.Cell("AV36").Style.NumberFormat.Format = "R$ #,##0.00";
+
+                    worksheet.Cell("I39").Value = "Hora extra";
+                    worksheet.Cell("AJ39").Value = holerite.Calculo_hora_extra;
+                    worksheet.Cell("AJ39").Style.NumberFormat.Format = "R$ #,##0.00";
+
+                    worksheet.Cell("I42").Value = "Faltas";
+                    worksheet.Cell("AV42").Value = holerite.Desconto_faltas_horas;
+                    worksheet.Cell("AV42").Style.NumberFormat.Format = "R$ #,##0.00";
+
+                    ////Vencimentos
+                    //worksheet.Cell("AJ67").Value = "5000";
+                    //worksheet.Cell("AV42").Style.NumberFormat.Format = "R$ #,##0.00";
+
+                    //worksheet.Cell("AV42").Value = "255";
+                    //worksheet.Cell("AV42").Style.NumberFormat.Format = "R$ #,##0.00";
+
+                    //Salario base
+                    worksheet.Cell("E79").Value = holerite.Salario_base;
+                    worksheet.Cell("E79").Style.NumberFormat.Format = "R$ #,##0.00";
+
+                    //Sal.Contr.INSS
+                    worksheet.Cell("P79").Value = holerite.Salario_Base_Inss;
+                    worksheet.Cell("P79").Style.NumberFormat.Format = "R$ #,##0.00";
+
+                    //Base Cálc.FGTS
+                    worksheet.Cell("U79").Value = holerite.Salario_Base_Inss;
+                    worksheet.Cell("U79").Style.NumberFormat.Format = "R$ #,##0.00";
+
+                    //FGTS do Mês
+                    worksheet.Cell("Z79").Value = holerite.Fgts;
+                    worksheet.Cell("Z79").Style.NumberFormat.Format = "R$ #,##0.00";
+
+                    //Base Cálc.IRRF
+                    worksheet.Cell("AL79").Value = holerite.Salario_base_ir;
+                    worksheet.Cell("AL79").Style.NumberFormat.Format = "R$ #,##0.00";
+
+                    //Faixa IRRF
+                    worksheet.Cell("BA79").Value = 0;
+                    worksheet.Cell("BA79").Style.NumberFormat.Format = "R$ #,##0.00";
+                    
+
+                    worksheet.Cell("K74").Value = funcionario.InformacoesTrabalhistas.Dt_admissao?.ToString("dd/MM/yyyy"); ;
+                    worksheet.Cell("T74").Value = funcionario.InformacoesTrabalhistas.Num_pis;
+
+                    worksheet.Cell("AK85").Value = holerite.Data_calculo?.ToString("dd/MM/yyyy") + holerite.Data_calculo?.ToString("ddd", new CultureInfo("pt-BR"));
+
 
                     workbook.SaveAs(spreadsheetStream);
                     System.IO.File.Delete(caminhoArquivo);

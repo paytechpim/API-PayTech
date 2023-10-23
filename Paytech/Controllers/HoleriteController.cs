@@ -47,9 +47,9 @@ namespace Paytech.Controllers
         }
 
         [HttpPost("GerarHolerite")]
-        public async Task<Retorno> GerarHolerite(int idFuncionario, DateTime dataCalculoSalarioMensal, double percentualHoraExtra, double valorValeTransporte, double faltas, double horaExtra)
+        public async Task<Retorno> GerarHolerite(int idFuncionario, DateTime data_inicio, DateTime data_fim, double percentualHoraExtra, double valorValeTransporte, double faltas, double horaExtra)
         {
-            return await new HoleriteService().GerarHolerite(idFuncionario, dataCalculoSalarioMensal, percentualHoraExtra, valorValeTransporte, faltas, horaExtra);
+            return await new HoleriteService().GerarHolerite(idFuncionario, data_inicio, data_fim, percentualHoraExtra, valorValeTransporte, faltas, horaExtra);
         }
 
         [HttpPost]
