@@ -11,5 +11,6 @@ namespace Paytech.Repositories
         Task<Retorno> GetById(int id);
         Task<Retorno> GetByIdFuncionario(int idFuncionario);
         Task<Retorno> GetAll();
+        int GetQtdFerias(int idFuncionario);
     }
 }

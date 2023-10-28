@@ -155,5 +155,11 @@ namespace Paytech.Repositories
                 return new Retorno(false, "Ocorreu um erro ao pesquisar: " + ex.Message);
             }
         }
+
+        public int GetQtdFerias(int idFuncionario)
+        {
+            using var db = new SqlConnection(configuration.GetConnectionString("sql"));
+            return db.QuerySingle<int>(Holerite.SELECT_QTD_FERIAS, new { Id_funcionario = idFuncionario });
+        }
     }
 }

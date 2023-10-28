@@ -5,10 +5,10 @@
         public static readonly string INSERT = @"
         INSERT INTO HOLERITE 
         (salario_base, Salario_Base_Inss, desconto_inss, salario_base_ir, desconto_ir, vale_transporte, calculo_hora_extra, desconto_faltas_horas, salario_liquido, 
-        deducao_dependente, fgts, faixa_ir, data_calculo, data_competencia_inicio, data_competencia_fim, ID_funcionario) 
+        deducao_dependente, fgts, faixa_ir, meses_referente, tipo, data_calculo, data_competencia_inicio, data_competencia_fim, ID_funcionario) 
         VALUES 
         (@Salario_base, @Salario_Base_Inss, @Desconto_inss, @Salario_base_ir, @Desconto_ir, @Vale_transporte, @Calculo_hora_extra, @Desconto_faltas_horas, @Salario_liquido, 
-        @Deducao_dependente, @Fgts, @Faixa_ir, GETDATE(), @Data_competencia_inicio, @Data_competencia_fim, @Id_funcionario
+        @Deducao_dependente, @Fgts, @Faixa_ir, @Meses_referente, @Tipo, GETDATE(), @Data_competencia_inicio, @Data_competencia_fim, @Id_funcionario
         ); SELECT SCOPE_IDENTITY();
         ";
         public static readonly string SELECT_ALL = "SELECT * FROM HOLERITE";
@@ -16,6 +16,7 @@
         public static readonly string SELECT_BY_ID_FUNCIONARIO = "SELECT * FROM HOLERITE WHERE id_funcionario = @Id_funcionario";
         public static readonly string SELECT_BY_PERIODO = "SELECT * FROM HOLERITE WHERE data_competencia_inicio >= @Data_Inicio AND data_competencia_fim <= @Data_Fim";
         public static readonly string SELECT_BY_PERIODO_FUNCIONARIO = "SELECT * FROM HOLERITE WHERE id_funcionario = @Id_funcionario AND data_competencia_inicio >= @Data_Inicio AND data_competencia_fim <= @Data_Fim";
+        public static readonly string SELECT_QTD_FERIAS = "SELECT COUNT(1) AS QTD_FERIAS FROM HOLERITE WHERE ID_funcionario = @Id_funcionario AND TIPO = 'ferias'";
         public static readonly string UPDATE = @"UPDATE HOLERITE 
         SET salario_base = @Salario_base, 
         Salario_Base_Inss = @Salario_Base_Inss, 
@@ -29,6 +30,8 @@
         deducao_dependente = @Deducao_dependente,
         fgts = @Fgts,
         faixa_ir = @Faixa_ir,
+        meses_referente = @Meses_referente,
+        Tipo = @Tipo,
         data_calculo = GETDATE(),
         data_competencia_inicio = @Data_competencia_inicio,
         data_competencia_fim = @Data_competencia_fim,
@@ -48,6 +51,8 @@
 	    public double? Deducao_dependente { get; set; }
 	    public double? Fgts  { get; set; }
 	    public double? Faixa_ir { get; set; }
+	    public double? Meses_referente { get; set; }
+	    public string? Tipo { get; set; }
         public DateTime? Data_calculo { get; set; }
         public DateTime? Data_competencia_Inicio { get; set; }
         public DateTime? Data_competencia_Fim { get; set; }

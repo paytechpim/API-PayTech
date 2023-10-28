@@ -1,5 +1,6 @@
 ﻿using ClosedXML.Excel;
 using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Drawing.Charts;
 using Microsoft.Data.SqlClient;
 using Newtonsoft.Json;
 using Paytech.Models;
@@ -42,9 +43,134 @@ namespace Paytech.Services
         {
             return _holeriteRepository.GetByIdFuncionario(idFuncionario);
         }
-        public Task<Retorno> GetAll() 
+        public Task<Retorno> GetAll()
         {
             return _holeriteRepository.GetAll();
+        }
+
+        public async Task<Retorno> GerarDecimoTerceiro(int idFuncionario, DateTime dataCalculo)
+        {
+            try
+            {
+                var funcionario = (Funcionario)new FuncionarioService().GetById(idFuncionario).Result.Dados;
+                Holerite holerite = new Holerite();
+                holerite.Id_funcionario = idFuncionario;
+
+                int anoAdmissao = funcionario.InformacoesTrabalhistas.Dt_admissao.Value.Year;
+                int anoCalculo = dataCalculo.Year;
+
+                holerite.Meses_referente = 0;
+
+                for (int ano = anoAdmissao; ano <= anoCalculo; ano++)
+                {
+                    int mesInicio = (ano == anoAdmissao) ? funcionario.InformacoesTrabalhistas.Dt_admissao.Value.Month : 1;
+                    int mesFim = (ano == anoCalculo) ? dataCalculo.Month : 12;
+
+                    int mesesNoAnoAtual = mesFim - mesInicio + 1;
+                    holerite.Meses_referente += mesesNoAnoAtual;
+
+                    if (ano < anoCalculo)
+                    {
+                        holerite.Meses_referente = 0;
+                    }
+                }
+
+                holerite.Salario_base = (funcionario.InformacoesTrabalhistas.Salario_Bruto / 12) * holerite.Meses_referente;
+                holerite.Salario_Base_Inss = holerite.Salario_base;
+                holerite.Desconto_inss = CalcularINSS((double)holerite.Salario_Base_Inss);
+                holerite.Deducao_dependente = DeducaoDependentes(funcionario.InformacoesTrabalhistas.Qtd_Dependentes.Value);
+                holerite.Salario_base_ir = holerite.Salario_base - holerite.Desconto_inss - holerite.Deducao_dependente;
+                holerite.Desconto_ir = CalcularIRRF((double)holerite.Salario_base_ir);
+                holerite.Salario_liquido = holerite.Salario_base - holerite.Desconto_inss - holerite.Desconto_ir;
+                holerite.Fgts = CalcularFgts((double)holerite.Salario_base);
+                holerite.Faixa_ir = RetornaFaixaIR((double)holerite.Salario_base_ir);
+
+                holerite.Data_competencia_Inicio = dataCalculo;
+                holerite.Data_competencia_Fim = dataCalculo;
+
+                holerite.Tipo = "decimo";
+
+                var retorno = Insert(holerite);
+
+                if (retorno.Result.Sucesso)
+                {
+                    return new Retorno(true, retorno.Result.Dados, "Decimo terciero gerado com sucesso");
+                }
+                else
+                {
+                    return new Retorno(false, "Ocorreu um erro ao gerar o decimo terciero: " + retorno.Result.Mensagem);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return new Retorno(false, "Ocorreu um erro ao gerar o decimo terceiro: " + ex.Message);
+            }
+        }
+
+        public async Task<Retorno> GerarCalculoFerias(int idFuncionario, DateTime data_inicio, DateTime data_fim)
+        {
+            try
+            {
+                if ((data_fim - data_inicio).Days != 30)
+                {
+                    return new Retorno(false, "O Período de férias é necessário que seja de 30 dias");
+                }
+
+                var funcionario = (Funcionario)new FuncionarioService().GetById(idFuncionario).Result.Dados;
+                Holerite holerite = new Holerite();
+
+                var qtdFeriasFuncionario = new HoleriteRepository().GetQtdFerias(idFuncionario);
+
+                var dataAdmissao = funcionario.InformacoesTrabalhistas.Dt_admissao.Value;
+                
+                if (data_inicio < dataAdmissao)
+                {
+                    return new Retorno(false, "A data de cálculo não pode ser anterior à data de admissão.");
+                }
+
+                int mesesTrabalhados = (data_inicio.Year - dataAdmissao.Year) * 12 + data_inicio.Month - dataAdmissao.Month;
+                int mesesProporcionais = mesesTrabalhados - (qtdFeriasFuncionario * 12);
+
+                if(mesesProporcionais < 12)
+                    return new Retorno(false, "Férias indiponíveis");
+
+                holerite.Salario_base = (double)funcionario.InformacoesTrabalhistas.Salario_Bruto.Value + ((double)funcionario.InformacoesTrabalhistas.Salario_Bruto.Value / 3);
+                holerite.Meses_referente = 12;
+                holerite.Salario_Base_Inss = holerite.Salario_base;
+                holerite.Desconto_inss = CalcularINSS(holerite.Salario_Base_Inss.Value);
+                holerite.Deducao_dependente = DeducaoDependentes((int)funcionario.InformacoesTrabalhistas.Qtd_Dependentes);
+                holerite.Salario_base_ir = holerite.Salario_Base_Inss - holerite.Desconto_inss - holerite.Deducao_dependente;
+                holerite.Desconto_ir = CalcularIRRF(holerite.Salario_base_ir.Value);
+                holerite.Fgts = CalcularFgts(holerite.Salario_Base_Inss.Value);
+                holerite.Faixa_ir = RetornaFaixaIR((double)holerite.Salario_base_ir);
+
+                holerite.Salario_liquido = holerite.Salario_Base_Inss - holerite.Desconto_inss - holerite.Desconto_ir;
+
+                holerite.Tipo = "ferias";
+
+                holerite.Data_competencia_Inicio = data_inicio;
+                holerite.Data_competencia_Fim = data_fim;
+                holerite.Id_funcionario = idFuncionario;
+
+                var retorno = Insert(holerite);
+
+                if (retorno.Result.Sucesso)
+                {
+                    return new Retorno(true, retorno.Result.Dados, "Ferias gerada com sucesso");
+                }
+                else
+                {
+                    return new Retorno(false, "Ocorreu um erro ao gerar a ferias: " + retorno.Result.Mensagem);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return new Retorno(false, "Ocorreu um erro ao gerar a ferias: " + ex.Message);
+            }
+
         }
 
         public async Task<Retorno> GerarHolerite(int idFuncionario, DateTime data_inicio, DateTime data_fim, double percentualHoraExtra, double valorValeTransporte, double faltas, double horaExtra)
@@ -76,6 +202,8 @@ namespace Paytech.Services
                 resultado.Id_funcionario = idFuncionario;
                 resultado.Data_competencia_Inicio = data_inicio;
                 resultado.Data_competencia_Fim = data_fim;
+
+                resultado.Tipo = "holerite";
 
                 var retorno = Insert(resultado);
 
