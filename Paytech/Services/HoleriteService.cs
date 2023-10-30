@@ -410,8 +410,13 @@ namespace Paytech.Services
                 var holerite = (Holerite)resultHolerite.Dados;
                 var funcionario = (Funcionario)new FuncionarioService().GetById((int)holerite.Id_funcionario).Result.Dados;
 
-                string caminhoArquivo = AppDomain.CurrentDomain.BaseDirectory + "../../../Templete/ArquivoRelatorio.xlsx";
-                string caminhoTemplate = AppDomain.CurrentDomain.BaseDirectory + "../../../Templete/RH_Holerite.xlsx";
+                string diretorioRaizDoProjeto = Directory.GetCurrentDirectory();
+
+                string nomeArquivo = "Templete/ArquivoRelatorio.xlsx";
+                string nomeTemplete = "Templete/RH_Holerite.xlsx";
+
+                string caminhoArquivo = Path.Combine(diretorioRaizDoProjeto, nomeArquivo);
+                string caminhoTemplate = Path.Combine(diretorioRaizDoProjeto, nomeTemplete);
 
                 System.IO.File.Delete(caminhoArquivo);
                 System.IO.File.Copy(caminhoTemplate, caminhoArquivo);
